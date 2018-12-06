@@ -101,7 +101,7 @@ codon2aa_table =  { 'aaa' : 'lys',
                     'tga' : 'stop' }
 
 
-cai_table = {   'ttt' : 0.296,
+cai_table_ec = {   'ttt' : 0.296,
                 'ttg' : 0.02,
                 'ttc' : 1,
                 'tta' : 0.2,

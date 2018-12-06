@@ -10,7 +10,7 @@ from SequenceDesigner import SequenceDesigner
 from Features.Structure import Structure,StructureMFE
 from Features import CAI,RNADuplex
 from DesignOfExperiments.Design import RandomSampling,Optimization,FullFactorial
-
+from Data import cai_table_ec
 
 class TranslationFeaturesEcoliDesigner(SequenceDesigner):
     
@@ -30,7 +30,7 @@ class TranslationFeaturesEcoliDesigner(SequenceDesigner):
         solution.cds_region = (49,len(solution.sequence))
         solution.keep_aa = True
         
-        cai_obj = CAI.CAI(solution=solution,label="cds",args= {  'cai_range' : (49,len(solution.sequence)), 'mutable_region' : range(49,len(solution.sequence)) } )
+        cai_obj = CAI.CAI(solution=solution,label="cds",cai_table=cai_table_ec, args= {  'cai_range' : (49,len(solution.sequence)), 'mutable_region' : range(49,len(solution.sequence)) } )
             
         #Look for RBS
         dup_obj1 = RNADuplex.RNADuplexRibosome(solution1=solution, label="sd16s", args = { 'rnaMolecule1region' : (25,48), 'mutable_region' : range(25,48) })

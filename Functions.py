@@ -163,7 +163,7 @@ def structureAnalysis(structure_file, propertyOfInterest="ss"):
             return []
 
 
-def analyzeCodons(seq, positions = None, data_table = cai_table):
+def analyzeCodons(seq, data_table, positions = None):
     '''
        given a sequence it returns a list with two elements: [ list_of_codons, list_of_codons_cai]
     '''    
@@ -232,7 +232,7 @@ def analyze_hydropathy(seq):
     score /= len_sq
     return score
 
-def analyze_cai(seq):
+def analyze_cai(seq, cai_table):
     seq = seq.lower();
     score = 0
     len_sq = 0
@@ -907,9 +907,9 @@ def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, pos=No
             return mutateAll(sequence, keep_aa, mutable_region, cds_region, pos, n_mut)
                 
     
-def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, pos=None, n_mut = [1,2]):
+def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos=None, n_mut = [1,2]):
     if keep_aa == True:                
-        result = analyzeCodons(sequence,mutableCodonsPosition)
+        result = analyzeCodons(seq=sequence,data_table=cai_table,positions=mutableCodonsPosition)
         
         n_mutations = choice(n_mut)
         
@@ -927,7 +927,7 @@ def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, pos=None, n_
                 new_codon = choice(alt_codons)
                 real_codon_pos = mutableCodonsPosition[rnd_ind]
                 codon_position = (real_codon_pos-cds_region[0])/3
-                all_codons = analyzeCodons(sequence,range(cds_region[0],cds_region[1]+1,3))[0]
+                all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cds_region[0],cds_region[1]+1,3))[0]
                 all_codons[codon_position]=new_codon
                 new_seq = sequence[:cds_region[0]] + ''.join(c for c in all_codons) + sequence[cds_region[1]+1:]
                 sequence = new_seq
@@ -966,7 +966,7 @@ def mutateAll(sequence, keep_aa, mutable_region, cds_region, pos=None, n_mut = [
     return new_seq               
     
 
-def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions, direction = '+'):
+def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions, cai_table, direction = '+'):
     '''
         Operator that given a sequence, mutates the sequence to change CAI
             sequnce: sequence 
@@ -982,7 +982,7 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
         sys.stderr.write("SimpleCAIOperator: No codons available for mutation\n")
         return None
     
-    result = analyzeCodons(sequence,mutableCodonsPosition)
+    result = analyzeCodons(seq=sequence,data_table=cai_table, positions=mutableCodonsPosition)
 
     codons = (result[0])    
     codons_cai = (result[1])    
@@ -1017,7 +1017,7 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
         #print "CAI operator: new_codon -> " + str(new_codon)    
         real_codon_pos = mutableCodonsPosition[rnd_ind]
         codon_position = (real_codon_pos-cai_range[0])/3
-        all_codons = analyzeCodons(sequence,range(cai_range[0],cai_range[1]+1,3))[0]             
+        all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cai_range[0],cai_range[1]+1,3))[0]
         all_codons[codon_position]=new_codon
 
                                      
@@ -1033,7 +1033,7 @@ def hammingDistance(seq1,seq2):
             
     return score_nt
     
-def SimpleHydropathyIndexOperator(sequence, hi_range, keep_aa, mutable_region, cds_regions, direction = '+'):
+def SimpleHydropathyIndexOperator(sequence, hi_range, keep_aa, mutable_region, cds_regions, cai_table, direction = '+'):
     '''
         Operator that given a sequence, mutates the sequence to change CAI
             sequnce: sequence 
@@ -1049,7 +1049,7 @@ def SimpleHydropathyIndexOperator(sequence, hi_range, keep_aa, mutable_region, c
         sys.stderr.write("SimpleHydropathyIndexOperator: No codons available for mutation\n")
         return None
     
-    result = analyzeCodons(sequence,mutableCodonsPosition,data_table = hydropathy_index_table)
+    result = analyzeCodons(seq=sequence,data_table=hydropathy_index_table,positions=mutableCodonsPosition)
     codons = (result[0])    
     codons_hi = (result[1])    
     codons_ind = range(0,codons.__len__())
@@ -1079,7 +1079,7 @@ def SimpleHydropathyIndexOperator(sequence, hi_range, keep_aa, mutable_region, c
         sys.stderr.write("SimpleHydropathyIndexOperator: Not able to mutate sequence\n")
         return None
     else:          
-        all_codons = analyzeCodons(sequence,range(hi_range[0],hi_range[1]+1,3))[0]             
+        all_codons = analyzeCodons(seq=sequence, data_table=cai_table, positions=range(hi_range[0],hi_range[1]+1,3))[0]
         all_codons[rnd_ind]=new_codon 
                                      
         new_seq = sequence[:hi_range[0]] + ''.join(c for c in all_codons) + sequence[hi_range[1]+1:]

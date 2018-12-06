@@ -18,7 +18,7 @@ class CAI(Feature):
         cds_region - a pair with begin and end of CDSs - example: (0,100)
         keep_aa - boolean option indicating if in the design mode amino acids should be kept
     """
-    def __init__(self, caiObject = None, solution = None, label="", args = { 'cai_range' : (0,59), 
+    def __init__(self, cai_table, caiObject = None, solution = None, label="", args = { 'cai_range' : (0,59),
                                                                              'mutable_region' : None, 
                                                                              'cds_region' : None, 
                                                                              'keep_aa' : True }):
@@ -31,6 +31,7 @@ class CAI(Feature):
             self.mutable_region     = args['mutable_region'] if args.has_key('mutable_region') else solution.mutable_region
             self.cds_region         = args['cds_region']    if args.has_key('cds_region') else solution.cds_region
             self.keep_aa            = args['keep_aa']        if args.has_key('keep_aa') else solution.keep_aa
+            self.cai_table = cai_table
             self.set_scores()
             self.set_level()
         else: #copy instance
@@ -45,12 +46,12 @@ class CAI(Feature):
 
     
     def set_scores(self, scoring_function=Functions.analyze_cai):     
-        self.scores[self.label+"CAI"] = scoring_function(self.sequence)
+        self.scores[self.label+"CAI"] = scoring_function(seq=self.sequence, cai_table=self.cai_table)
                                                                      
     def mutate(self, operator=Functions.SimpleCAIOperator):
         if not self.targetInstructions:
             return None
-        new_seq = operator(self.solution.sequence, self.cai_range, self.keep_aa, self.mutable_region, self.cds_region, self.targetInstructions['direction'])
+        new_seq = operator(self.solution.sequence, self.cai_range, self.keep_aa, self.mutable_region, self.cds_region, self.cai_table, self.targetInstructions['direction'])
         if not new_seq:
             return None                         
         return Solution.Solution(sol_id=str(uuid4().int), sequence=new_seq, cds_region = self.cds_region, mutable_region = self.mutable_region, parent=self.solution, design=self.solution.designMethod)

@@ -96,3 +96,7 @@ docs/_build_html/
 ..pytest_cache
 */.pytest_cache
 *.pytest_cache
+
+
+testFiles/outputFiles/*
+testFiles/outputFiles/

@@ -29,19 +29,25 @@ class TranslationFeaturesEcoliDesigner(SequenceDesigner):
         solution.mutable_region=range(0,len(solution.sequence)) # whole region
         solution.cds_region = (49,len(solution.sequence))
         solution.keep_aa = True
-        
-        cai_obj = CAI.CAI(solution=solution,label="cds",cai_table=cai_table_ec, args= {  'cai_range' : (49,len(solution.sequence)), 'mutable_region' : range(49,len(solution.sequence)) } )
+
+        cai_obj = CAI.CAI(solution=solution,
+                          label="cds",
+                          cai_table=cai_table_ec,
+                          args={'cai_range'     : (49, len(solution.sequence)),
+                                'mutable_region': range(49, len(solution.sequence))})
             
         #Look for RBS
-        dup_obj1 = RNADuplex.RNADuplexRibosome(solution1=solution, label="sd16s", args = { 'rnaMolecule1region' : (25,48), 'mutable_region' : range(25,48) })
+        dup_obj1 = RNADuplex.RNADuplexRibosome(solution1=solution, label="sd16s",
+                                               args={'rnaMolecule1region': (25, 48), 'mutable_region': range(25, 48)})
         dup_mfe = RNADuplex.RNADuplexMFE(dup_obj1)
         dup_obj1.add_subfeature(dup_mfe)
-        
-        #MFE [-30,30]
-        st1_obj = Structure(solution=solution,label="utr",args= { 'structure_range' : (49-30,49+30), 'mutable_region' : range(49-30,49+30) } )
+
+        # MFE [-30,30]
+        st1_obj = Structure(solution=solution, label="utr",
+                            args={'structure_range': (49 - 30, 49 + 30), 'mutable_region': range(49 - 30, 49 + 30)})
         st_mfe = StructureMFE(st1_obj)
         st1_obj.add_subfeature(st_mfe)
-        
+
         solution.add_feature(cai_obj)
         solution.add_feature(dup_obj1)
         solution.add_feature(st1_obj)                    
@@ -119,16 +125,27 @@ if __name__ == '__main__':
     seed29='ctaacgcatgctagtttaatgacataaggtaggtgaaacggagattggagtgaaaaagtttcgatgggtcgttctggttgtcgtggtgttggcttgcttgctgctttgggcgcaggtattcaacatgatgtgcgatcaggatgtacaatttttcagcggaatttgtgccattaaccagtttatcccgtggtga'
     seed30='ataaaagttatctcccttctcgttcatcgttccatatttgagaaacagtatgtcttccagagttttgaccccggacgtcgttggtattgacgccctggtacacgatcaccaaaccgttctggcaaaagctgaaggcggtgtggttgccgtatttgctaacaatgccccggcgttttatgccgtcacgcctgcacgcctggctgaactgctggcgctggaagaaaagctggcgcgtccgggaagcgatgtcgctctggacgatcaactctatcaggaaccgcaagccgctcccgttgctgtacccatggggaaattcgccatgtatccggactggcaacccgatgccgattttatccgcctggcggcgctatggggcgtggcgctaagagagccggtgaccaccgaagaactggcctcattcattgcctactggcaggcggaaggtaaagtctttcaccatgtgcagtggcaacaaaaactggcgcgcagcctgcaaatcggtcgtgccagcaacggcggactgccgaaacgagatgtgaatacggtcagcgaacctgacagccaaattccaccaggattcagagggtaa'
 
-    
-    #Design Methodology and thresholds
-    design_param = {  "sd16sRNADuplexMFE": { 'type' : 'REAL' , 
-                                             'thresholds' : { '1': (-12.7,-7.3), '2': (-7.3,-5.8), '3': (-5.8,-5.2), '4': (-5.2,-3.3), '5': (-3.3, 2.0) } },
-                      "utrStructureMFE"  : { 'type' : 'REAL' , 
-                                             'thresholds' : { '1': (-29.2,-12.2), '2': (-12.2,-9.95), '3': (-9.95,-8.4), '4': (-8.4,-6.73), '5': (-6.73,0.65) } },
-                      "cdsCAI"           : { 'type' : 'REAL' , 
-                                             'thresholds' : { '1': (0.13,0.29), '2': (0.29,0.33), '3': (0.33,0.37), '4': (0.37,0.42), '5': (0.42,0.86) } }                   
-                   
-                     }
+    # Design Methodology and thresholds
+    design_param = {"sd16sRNADuplexMFE": {'type'      : 'REAL',
+                                          'thresholds': {'1': (-12.7, -7.3),
+                                                         '2': (-7.3, -5.8),
+                                                         '3': (-5.8, -5.2),
+                                                         '4': (-5.2, -3.3),
+                                                         '5': (-3.3, 2.0)}},
+                    "utrStructureMFE"  : {'type'      : 'REAL',
+                                          'thresholds': {'1': (-29.2, -12.2),
+                                                         '2': (-12.2, -9.95),
+                                                         '3': (-9.95, -8.4),
+                                                         '4': (-8.4, -6.73),
+                                                         '5': (-6.73, 0.65)}},
+                    "cdsCAI"           : {'type'      : 'REAL',
+                                          'thresholds': {'1': (0.13, 0.29),
+                                                         '2': (0.29, 0.33),
+                                                         '3': (0.33, 0.37),
+                                                         '4': (0.37, 0.42),
+                                                         '5': (0.42, 0.86)}}
+
+                    }
         
         
     if len(sys.argv)>=2: #Command line options 

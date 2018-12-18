@@ -209,36 +209,42 @@ class DBSQLite(DBAbstract):
         returns: Nothing
         '''
         pass
-    
+
         if self.gen_solutions_id.has_key(solution.solid) or solution.valid == False:
-            return 0             
+            return 0
         else:
             self.gen_solutions_id[solution.solid] = '1'
-            
-        key = '.'.join([str(solution.levels[feature+'Level']) for feature in self.designMethod.featuresList]) 
-        
-        if not self.designMethod.listDesigns==[]: #RandomSampling mode does not have desired targets
-            if desired_solution_id == "": #Worker found solution for something it WASN'T looking for                
-                if self.des_solutions.has_key(key):            
+
+        key = '.'.join([str(solution.levels[feature + 'Level']) for feature in self.designMethod.featuresList])
+
+        if not self.designMethod.listDesigns == []:  # RandomSampling mode does not have desired targets
+            if desired_solution_id == "":  # Worker found solution for something it WASN'T looking for
+                if self.des_solutions.has_key(key):
                     desired_solution_id = str(self.des_solutions[key]['des_solution_id'])
                     if self.des_solutions[key]['status'] != 'DONE':
                         self.des_solutions[key]['status'] = 'DONE'
-                        self.des_solutions_sql.append({'worker_id' : self.worker_id, 'status': 'DONE', 'des_solution_id' : desired_solution_id})                    
+                        self.des_solutions_sql.append(
+                                {'worker_id': self.worker_id, 'status': 'DONE', 'des_solution_id': desired_solution_id})
             else:
-                self.des_solutions[key]['status'] = 'DONE'                                                  
-                self.des_solutions_sql.append({'worker_id' : self.worker_id, 'status': 'DONE', 'des_solution_id' : desired_solution_id})
+                self.des_solutions[key]['status'] = 'DONE'
+                self.des_solutions_sql.append(
+                        {'worker_id': self.worker_id, 'status': 'DONE', 'des_solution_id': desired_solution_id})
         else:
             desired_solution_id = key
-                        
-        #update generated solution table
-        dict_with_values = {'generated_solution_id' : solution.solid, 
-                            'des_solution_id': desired_solution_id,  
-                            'sequence' :solution.sequence ,
-                            'worker_id': self.worker_id}
+
+        # update generated solution table
+        dict_with_values = {'generated_solution_id': solution.solid,
+                            'des_solution_id'      : desired_solution_id,
+                            'sequence'             : solution.sequence,
+                            'worker_id'            : self.worker_id}
         dict_with_values.update(solution.scores)
-        dict_with_values.update(solution.levels)                
-        dict_with_values.update({ (feature+'Position'): self.calculateRelativeLevel(feature,solution.levels[feature+'Level'],solution.scores[feature]) for feature in self.designMethod.features })
-        
+        dict_with_values.update(solution.levels)
+
+        dict_with_values.update({(feature + 'Position'): self.calculateRelativeLevel(feature,
+                                                                                     solution.levels[feature + 'Level'],
+                                                                                     solution.scores[feature]) for
+                                 feature in self.designMethod.features})
+
         self.gen_solutions_sql.append(dict_with_values)
         
     def DBCloseConnection(self):
@@ -299,9 +305,9 @@ class DBSQLite(DBAbstract):
         
         if level == '?':
             return 0
-        
+
         thresholds = self.designMethod.thresholds[feature][level]
-        
+
         if isinstance(thresholds,tuple): 
             t_max = thresholds[1]
             t_min = thresholds[0]

@@ -16,7 +16,7 @@ class RNADuplexRNAFold(Feature):
         rnaMolecule1/2region - start and end position to hybridize molecules - a tuple in the form (start, end)  
         NOTE: Design mode not implemented for this feature        
     """
-    def __init__(self, duplexObject=None, solution1=None, solution2=None, label="", args = { 'rnaMolecule1region' : None,                                                                                            
+    def __init__(self, duplexObject=None, solution1=None, solution2=None, label="", args = { 'rnaMolecule1region' : None,
                                                                                              'rnaMolecule2region' : None }):
         if duplexObject == None:           
             #General properties of feature
@@ -39,7 +39,7 @@ class RNADuplexRNAFold(Feature):
             self.set_level()
         else:
             #General properties of feature
-            Feature.__init__(self, duplexObject)
+            Feature.__init__(self, featureObject=duplexObject)
             #Specifics of this Feature
             self.solution           = duplexObject.solution
             self.solution2           = duplexObject.solution2
@@ -55,13 +55,14 @@ class RNADuplexRNAFold(Feature):
             self.cds_regions2        = duplexObject.cds_regions2
             self.keep_aa2            = duplexObject.keep_aa2
             self.scores              = duplexObject.scores
-            
-                           
-    
+
     def set_scores(self, scoring_function = Functions.analyze_duplex_structure_rnafold):
-        self.scores.update(Functions.appendLabelToDict(scoring_function(self.rnaMolecule1seq,self.rnaMolecule2seq,self.duplexFile), self.label))        
-        pass
-    
+        self.scores.update(Functions.appendLabelToDict(scoring_function(seq1=self.rnaMolecule1seq,
+                                                                        seq2=self.rnaMolecule2seq,
+                                                                        filename=self.duplexFile,
+                                                                        project_dir=self.solution.project_dir),
+                                                       self.label))
+
     def mutate(self):        
         return Feature.randomMutation(self, mutable_region=self.mutable_region)
 
@@ -77,13 +78,19 @@ class RNADuplexRNAFoldRibosome(RNADuplexRNAFold):
         cds_region - a pair with begin and end of CDSs - example: (0,100)
         keep_aa - boolean option indicating if in the design mode amino acids should be kept        
     """
-    def __init__(self, solution1=None, label="", args = { 'rnaMolecule1region' : None,
-                                                          'mutable_region1' : None, 
-                                                          'cds_region1' : None,
-                                                          'keep_aa1' : True } ):
-        ribRNA = Solution.Solution(sol_id = '16S', sequence='acctcctta')
+    def __init__(self, solution1=None, label="", args = { 'rnaMolecule1region': None,
+                                                                       'mutable_region1'   : None,
+                                                                       'cds_region1'       : None,
+                                                                       'keep_aa1'          : True}):
+        # TODO: allow custom 16S sequence? is that necessary?
+        # TODO: dont think this needs a dir but double check
+        ribRNA = Solution.Solution(sol_id = '16S', sequence='acctcctta', project_dir=None)
         args.update({ 'rnaMolecule2region' : (0,8) })
-        RNADuplexRNAFold.__init__(self,solution1=solution1, solution2=ribRNA,label=label, args=args)
+        RNADuplexRNAFold.__init__(self,
+                                  solution1=solution1,
+                                  solution2=ribRNA,
+                                  label=label,
+                                  args=args)
         self.solution = solution1
         self.keep_aa          = args['keep_aa'] if args.has_key('keep_aa') else solution1.keep_aa
         self.mutable_region   = args['mutable_region'] if args.has_key('mutable_region') else solution1.mutable_region
@@ -95,13 +102,16 @@ class RNADuplexRNAFoldMFE(RNADuplexRNAFold):
     Manipulate the duplex MFE
     """
     def __init__(self, duplexObject, label = ""):
-        RNADuplexRNAFold.__init__(self,duplexObject=duplexObject)
+        RNADuplexRNAFold.__init__(self,
+                                  duplexObject=duplexObject)
         self.label = self.label + label
         self.set_scores()
         self.set_level()      
         
     def set_scores(self, scoring_function=Functions.analyze_duplex_mfe_rnafold):    
-        self.scores.update(Functions.appendLabelToDict(scoring_function(self.duplexFile), self.label))
+        self.scores.update(Functions.appendLabelToDict(scoring_function(filename=self.duplexFile,
+                                                                        project_dir=self.solution.project_dir),
+                                                       self.label))
         
 
 import Solution

@@ -19,14 +19,14 @@ class StructureRNAFold(Feature):
         cds_region - a pair with begin and end of CDSs - example: (0,100)
         keep_aa - boolean option indicating if in the design mode amino acids should be kept
     """    
-    def __init__(self, project_dir, structureObject = None, solution = None, label="", args = { 'structure_range' : (0,59),
+    def __init__(self, structureObject = None, solution = None, label="", args = { 'structure_range' : (0,59),
                                                                                    'mutable_region' : None, 
                                                                                    'cds_region' : None, 
                                                                                    'keep_aa' : True }):
         
         if structureObject == None: #create new instance
             #General properties of feature
-            Feature.__init__(self, project_dir=project_dir, solution=solution, label=label)
+            Feature.__init__(self, solution=solution, label=label)
             #Specifics of this Feature
             self.structurefile      = solution.solid + label
             self.structure_range    = args['structure_range']        
@@ -37,7 +37,7 @@ class StructureRNAFold(Feature):
             self.set_scores()
             self.set_level()                    
         else: #copy instance
-            Feature.__init__(self, project_dir=project_dir, featureObject=structureObject)
+            Feature.__init__(self, featureObject=structureObject)
             self.structurefile      = structureObject.structurefile
             self.structure_range    = structureObject.structure_range         
             self.sequence           = structureObject.sequence
@@ -47,7 +47,7 @@ class StructureRNAFold(Feature):
             self.scores             = structureObject.scores
                             
     def set_scores(self, scoring_function=Functions.analyze_structure_rnafold):
-        scoring_function(seq=self.sequence, filename=self.structurefile, project_dir=self.project_dir)
+        scoring_function(seq=self.sequence, filename=self.structurefile, project_dir=self.solution.project_dir)
                                                                      
     def mutate(self):        
         return Feature.randomMutation(self, mutable_region=self.mutable_region)
@@ -56,13 +56,13 @@ class StructureRNAFoldMFE(StructureRNAFold):
     """
     Manipulate the structure MFE
     """
-    def __init__(self, project_dir, structureObject, label = ""):
-        StructureRNAFold.__init__(self, project_dir=project_dir, structureObject=structureObject)
+    def __init__(self, structureObject, label = ""):
+        StructureRNAFold.__init__(self, structureObject=structureObject)
         self.label = self.label + label
         self.set_scores()
         self.set_level()
         
     def set_scores(self, scoring_function=Functions.analyze_structure_mfe_rnafold):    
-        self.scores.update(Functions.appendLabelToDict(scoring_function(filename=self.structurefile, project_dir=self.project_dir), self.label))
+        self.scores.update(Functions.appendLabelToDict(scoring_function(filename=self.structurefile, project_dir=self.solution.project_dir), self.label))
                         
 import Solution

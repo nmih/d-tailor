@@ -10,7 +10,7 @@ class Feature(object):
     '''
     A master class for Solution Features to be manipulated
     '''
-    def __init__(self, project_dir, featureObject=None, solution=None, label=""):
+    def __init__(self, featureObject=None, solution=None, label=""):
         
         if featureObject == None: #create a new instance of object
             self.scores             = {}        
@@ -19,7 +19,7 @@ class Feature(object):
             self.targetInstructions = {}
             self.subfeatures        = {}
             self.level              = None
-            self.project_dir = project_dir
+            self.project_dir = solution.project_dir
         else: #copy instance
             self.solution           = featureObject.solution
             self.label              = featureObject.label

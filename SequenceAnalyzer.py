@@ -4,6 +4,7 @@ Created on Nov 1, 2012
 @author: jcg
 '''
 
+import os
 import sys
 from Solution import Solution
 from csv import DictReader
@@ -14,7 +15,9 @@ class SequenceAnalyzer(object):
     Initializes class that analyzes sequence features 
     '''
     
-    def __init__(self, input_file, input_type, sep = ","):
+    def __init__(self, input_file, input_type, root_dir, sep = ","):
+
+        self.root_dir = root_dir
         
         if input_type == "CSV":
             self.list_of_input_sequences = self.readCSV(input_file,sep)
@@ -76,7 +79,7 @@ class SequenceAnalyzer(object):
             sol_id = sequence['name']
             seq = sequence['sequence']
             
-            solution = Solution(sol_id = sol_id, sequence = seq)
+            solution = Solution(sol_id = sol_id, sequence = seq, project_dir=os.path.join(self.root_dir, sol_id))
             self.configureSolution(solution)
             
             self.output(solution)

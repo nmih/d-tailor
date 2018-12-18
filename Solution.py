@@ -26,7 +26,7 @@ class Solution:
     #         self.sequence = None
     #         return None
 
-    def __init__(self, sol_id, sequence, cds_region=None, keep_aa=False, mutable_region=None, parent=None,
+    def __init__(self, sol_id, sequence, project_dir, cds_region=None, keep_aa=False, mutable_region=None, parent=None,
                  design=None):
 
         #check if solution is in DB        
@@ -41,6 +41,7 @@ class Solution:
         self.features           = {}
         self.designMethod       = design
         self.valid = True
+        self.project_dir = project_dir
                 
     def add_feature(self,feature):
         featureLabel=feature.label+feature.__class__.__name__

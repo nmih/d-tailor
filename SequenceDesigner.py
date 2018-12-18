@@ -11,6 +11,7 @@ from random import choice
 from Functions import hammingDistance, pick_random_tuple
 from math import exp, sqrt
 import sys
+import os
 
 class SequenceDesigner(object):
     
@@ -18,7 +19,7 @@ class SequenceDesigner(object):
     Initializes class that design sequences based on a design method
     '''
     
-    def __init__(self, name, seed, design, dbfile, createDB=True):        
+    def __init__(self, name, seed, design, dbfile, root_dir, createDB=True):
         
         self.name           = name
         self.designMethod   = design
@@ -28,7 +29,8 @@ class SequenceDesigner(object):
         self.max_sol_counter= 100000 
         self.temp_ON        = True
         self.temp_init      = 100
-        self.temp_schedule  = 0.79 
+        self.temp_schedule  = 0.79
+        self.root_dir  = root_dir
 
         self.dbconnection = DBSQLite(dbfile=dbfile,designMethod=design,initialize=createDB,seedSequence=seed)
         
@@ -95,19 +97,21 @@ class SequenceDesigner(object):
         
         euc_dist = sqrt(euc_dist)
         
-        return euc_dist      
-        
-    
-    def run(self, selection = "directional"):    
-        
+        return euc_dist
+
+    def run(self, selection="directional"):
+
         start_time = time()
         sol_counter = 1
-        last_counter   = 1
+        last_counter = 1
         last_timepoint = time()
-        accepted = 1     
-        initial_dist = 0            
-        
-        master = Solution(sol_id=self.dbconnection.seedId,sequence=self.dbconnection.seedSequence,design=self.designMethod)
+        accepted = 1
+        initial_dist = 0
+
+        master = Solution(sol_id=self.dbconnection.seedId,
+                          sequence=self.dbconnection.seedSequence,
+                          design=self.designMethod,
+                          project_dir=os.path.join(self.root_dir, self.dbconnection.seedId))
         self.configureSolution(master)
         self.validateSolution(master)
         solution = master    

@@ -132,16 +132,22 @@ class Feature(object):
         
         return 
 
-    def randomMutation(self,pos=None,n_mut=[1,2],mutable_region=None):
+    def randomMutation(self, pos=None,n_mut=[1,2],mutable_region=None):
         if mutable_region == None:
             if self.mutable_region == None:
                 mutable_region = self.solution.mutable_region
             else:
                 mutable_region = self.mutable_region
-                                      
-        new_seq = Functions.randomMutationOperator(self.solution.sequence, self.solution.keep_aa, mutable_region, self.solution.cds_region, pos,n_mut=n_mut)
-        
-        return Solution.Solution(sol_id=str(uuid4().int), sequence=new_seq, cds_region = self.solution.cds_region, keep_aa = self.solution.keep_aa, mutable_region = self.solution.mutable_region, parent=self.solution, design=self.solution.designMethod)
+
+        new_seq = Functions.randomMutationOperator(self.solution.sequence, self.solution.keep_aa, mutable_region,
+                                                   self.solution.cds_region,
+                                                   cai_table=self.solution.features['cdsCAI'].cai_table, pos=pos,
+                                                   n_mut=n_mut)
+
+        return Solution.Solution(sol_id=str(uuid4().int), sequence=new_seq, project_dir=self.solution.project_dir,
+                                 cds_region=self.solution.cds_region, keep_aa=self.solution.keep_aa,
+                                 mutable_region=self.solution.mutable_region, parent=self.solution,
+                                 design=self.solution.designMethod)
 
         
     def mutate(self,mutable_region=None):

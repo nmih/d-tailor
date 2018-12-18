@@ -83,4 +83,3 @@ class SequenceAnalyzer(object):
             self.configureSolution(solution)
             
             self.output(solution)
-            

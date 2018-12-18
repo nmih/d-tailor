@@ -44,16 +44,20 @@ class CAI(Feature):
             self.codons_cai         = caiObject.codons_cai
             self.scores             = caiObject.scores
 
-    
-    def set_scores(self, scoring_function=Functions.analyze_cai):     
-        self.scores[self.label+"CAI"] = scoring_function(seq=self.sequence, cai_table=self.cai_table)
-                                                                     
+    def set_scores(self, scoring_function=Functions.analyze_cai):
+        self.scores[self.label + "CAI"] = scoring_function(seq=self.sequence, cai_table=self.cai_table)
+
     def mutate(self, operator=Functions.SimpleCAIOperator):
         if not self.targetInstructions:
             return None
-        new_seq = operator(self.solution.sequence, self.cai_range, self.keep_aa, self.mutable_region, self.cds_region, self.cai_table, self.targetInstructions['direction'])
+        new_seq = operator(self.solution.sequence, self.cai_range, self.keep_aa, self.mutable_region, self.cds_region,
+                           self.cai_table, self.targetInstructions['direction'])
         if not new_seq:
-            return None                         
-        return Solution.Solution(sol_id=str(uuid4().int), sequence=new_seq, cds_region = self.cds_region, mutable_region = self.mutable_region, parent=self.solution, design=self.solution.designMethod)
-        
+            return None
+        return Solution.Solution(project_dir=self.solution.project_dir,
+                                 sol_id=str(uuid4().int), sequence=new_seq, cds_region=self.cds_region,
+                                 mutable_region=self.mutable_region, parent=self.solution,
+                                 design=self.solution.designMethod)
+
+
 import Solution

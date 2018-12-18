@@ -19,13 +19,16 @@ class Solution:
         parent - Solution from which the current Solution was derived
         
     '''
-    def __init__(self, sol_id = 0, sequence="", cds_region = None, keep_aa = False, mutable_region = None, parent=None, design = None):
-        
-        if sequence == None:
-            sys.stderr.write("Tried to create a solution with sequence NULL\n")
-            self.sequence = None
-            return None
-                
+    # def __init__(self, sol_id = 0, sequence="", cds_region = None, keep_aa = False, mutable_region = None, parent=None, design = None):
+    #
+    #     if sequence == None:
+    #         sys.stderr.write("Tried to create a solution with sequence NULL\n")
+    #         self.sequence = None
+    #         return None
+
+    def __init__(self, sol_id, sequence, cds_region=None, keep_aa=False, mutable_region=None, parent=None,
+                 design=None):
+
         #check if solution is in DB        
         self.mutable_region     = mutable_region                        
         self.cds_region         = cds_region

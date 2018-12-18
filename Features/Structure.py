@@ -19,14 +19,14 @@ class Structure(Feature):
         cds_region - a pair with begin and end of CDSs - example: (0,100)
         keep_aa - boolean option indicating if in the design mode amino acids should be kept
     """    
-    def __init__(self, structureObject = None, solution = None, label="", args = { 'structure_range' : (0,59), 
+    def __init__(self, project_dir, structureObject = None, solution = None, label="", args = { 'structure_range' : (0,59),
                                                                                    'mutable_region' : None, 
                                                                                    'cds_region' : None, 
                                                                                    'keep_aa' : True }):
         
         if structureObject == None: #create new instance
             #General properties of feature
-            Feature.__init__(self, solution=solution, label=label)
+            Feature.__init__(self, project_dir=project_dir, solution=solution, label=label)
             #Specifics of this Feature
             self.structurefile      = solution.solid + label
             self.structure_range    = args['structure_range']        
@@ -45,9 +45,10 @@ class Structure(Feature):
             self.cds_region         = structureObject.cds_region
             self.keep_aa            = structureObject.keep_aa
             self.scores             = structureObject.scores
+
                             
     def set_scores(self, scoring_function=Functions.analyze_structure): 
-        scoring_function(self.sequence, self.structurefile)
+        scoring_function(seq=self.sequence, filename=self.structurefile, project_dir=self.project_dir)
                                                                      
     def mutate(self, operator=Functions.SimpleStructureOperator):        
         if not self.targetInstructions:
@@ -64,14 +65,14 @@ class StructureMFE(Structure):
     """
     Manipulate the structure MFE
     """
-    def __init__(self, structureObject, label = ""):
-        Structure.__init__(self,structureObject)
+    def __init__(self, project_dir, structureObject, label = ""):
+        Structure.__init__(self, project_dir=project_dir, structureObject=structureObject)
         self.label = self.label + label
         self.set_scores()
         self.set_level()      
         
     def set_scores(self, scoring_function=Functions.analyze_structure_mfe):    
-        self.scores.update(Functions.appendLabelToDict(scoring_function(self.structurefile), self.label))
+        self.scores.update(Functions.appendLabelToDict(scoring_function(filename=self.structurefile, project_dir=self.project_dir), self.label))
 
 
 class StructureSingleStranded(Structure):

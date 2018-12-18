@@ -8,6 +8,8 @@ import os
 import sys
 from Solution import Solution
 from csv import DictReader
+from Bio import SeqIO
+
 
 class SequenceAnalyzer(object):
     
@@ -40,25 +42,30 @@ class SequenceAnalyzer(object):
         return list_seq
 
     def readFASTA(self,input_file):
-        pass
+        # pass
+        # list_seq = []
+        #
+        # reader = open(input_file)
+        #
+        # name = ""
+        # seq  = ""
+        #
+        # for l in reader:
+        #     l=l.rstrip()
+        #
+        #     if l[0] == ">":
+        #         name = l.split(' ')[0][1:]
+        #     else:
+        #         seq = l
+        #         list_seq.append({ 'name' : name , 'sequence' : seq})
+        #
+        # return list_seq
         list_seq = []
-        
-        reader = open(input_file)
-        
-        name = ""
-        seq  = ""
-        
-        for l in reader:
-            l=l.rstrip()
-            
-            if l[0] == ">":
-                name = l.split(' ')[0][1:]
-            else:
-                seq = l                            
-                list_seq.append({ 'name' : name , 'sequence' : seq})
-            
+        with open(input_file) as f:
+            for s in SeqIO.parse(f, 'fasta'):
+                list_seq.append({'name': s.id, 'sequence': str(s.seq)})
         return list_seq
-    
+
     def readGENBANK(self):
         pass        
             

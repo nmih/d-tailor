@@ -9,6 +9,7 @@ import sys
 from Solution import Solution
 from csv import DictReader
 from Bio import SeqIO
+from tqdm import tqdm
 
 
 class SequenceAnalyzer(object):
@@ -77,16 +78,19 @@ class SequenceAnalyzer(object):
     
     def output(self,solution):
         pass
-        
+
     def run(self):
         
-        self.outputStart()
+        # self.outputStart()
+        final_output = {}
         
-        for sequence in self.list_of_input_sequences:
+        for sequence in tqdm(self.list_of_input_sequences):
             sol_id = sequence['name']
             seq = sequence['sequence']
             
             solution = Solution(sol_id = sol_id, sequence = seq, project_dir=os.path.join(self.root_dir, sol_id))
             self.configureSolution(solution)
-            
-            self.output(solution)
+
+            final_output[sol_id] = self.output(solution)
+
+        return final_output

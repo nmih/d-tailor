@@ -114,7 +114,11 @@ class SequenceDesigner(object):
                           project_dir=os.path.join(self.root_dir, self.dbconnection.seedId))
         self.configureSolution(master)
         self.validateSolution(master)
-        solution = master    
+        solution = master
+
+        print('Starting scores:')
+        print(master.scores)
+        print(master.levels)
         
         if not master.valid:
             raise Exception("Seed inserted is not a valid sequence!")

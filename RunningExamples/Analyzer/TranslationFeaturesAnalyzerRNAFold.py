@@ -12,12 +12,13 @@ class TranslationFeaturesAnalyzer(SequenceAnalyzer):
     Class to analyze CAI and RNA structure
     '''
 
-    def __init__(self, input_file, input_type, cai_table, root_dir):
+    def __init__(self, input_file, input_type, cai_table, mfe_from_to, root_dir):
         SequenceAnalyzer.__init__(self,
                                   input_file,
                                   input_type,
                                   root_dir=root_dir)
         self.cai_table = cai_table
+        self.mfe_from_to = mfe_from_to
 
     def configureSolution(self, solution):
 
@@ -38,7 +39,7 @@ class TranslationFeaturesAnalyzer(SequenceAnalyzer):
             # MFE entire sequence
             st1_obj = StructureRNAFold(solution=solution,
                                        label="utr",
-                                       args={'structure_range': (0, len(solution.sequence))})
+                                       args={'structure_range': (self.mfe_from_to[0], self.mfe_from_to[1])})
             st_mfe = StructureRNAFoldMFE(structureObject=st1_obj)
             st1_obj.add_subfeature(st_mfe)
             solution.add_feature(st1_obj)
@@ -57,7 +58,10 @@ class TranslationFeaturesAnalyzer(SequenceAnalyzer):
 
     def output(self, solution):
         if solution.valid:
-            print solution.solid, ',',
-            # print solution.scores['sd16sRNADuplexRNAFoldMFE'], ',',
-            print solution.scores['utrStructureRNAFoldMFE'], ',',
-            print solution.scores['cdsCAI']
+            # print solution.solid, ',',
+            # # print solution.scores['sd16sRNADuplexRNAFoldMFE'], ',',
+            # print solution.scores['utrStructureRNAFoldMFE'], ',',
+            # print solution.scores['cdsCAI']
+
+            return {'utrStructureRNAFoldMFE': solution.scores['utrStructureRNAFoldMFE'],
+                    'cdsCAI': solution.scores['cdsCAI']}

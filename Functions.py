@@ -1087,7 +1087,7 @@ def SimplePWMPositionOperator(seq, pwmnt, position=None, mutable_region = None, 
     return new_seq
 
 
-def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_table, pos=None, n_mut = [1,2]):
+def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_table=None, pos=None, n_mut = [1,2]):
     '''
         Operator that given a sequence, mutates the sequence randomly
             sequnce: sequence   

@@ -91,18 +91,22 @@ def validateCDS(cds=""):
     
     #cds length is multiple of 3
     if len(cds) % 3 != 0:
+        print('Error: CDS length is not a multiple of 3')
         return False
     
     #starts with a start codon (ATG, GTG, TTG)
     if cds[0:3] not in ('atg','gtg','ttg'):
+        print('Error: does not start with a start codon')
         return False
     
     #stop with a stop codon
     if cds[-3:] not in ('taa','tag','tga'):
+        print('Error: does not stop with a stop codon')
         return False
         
     #stop codon in the middle
     if len(set([cds[i:i+3] for i in range(3,len(cds)-3,3)]).intersection(['taa','tag','tga'])) != 0:
+        print('Error: stop codon found within sequence')
         return False
     
     return True

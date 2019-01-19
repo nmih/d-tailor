@@ -4,70 +4,8 @@ Created on Oct 3, 2011
 @author: jcg
 '''
 
-codon2aa_table =  { 'aaa' : 'lys',
-                    'aag' : 'lys',
-                    'tta' : 'leu',
-                    'ttg' : 'leu',
-                    'ctt' : 'leu',
-                    'ctc' : 'leu',
-                    'cta' : 'leu',
-                    'ctg' : 'leu',
-                    'gaa' : 'glu',
-                    'gag' : 'glu',
-                    'caa' : 'gln',
-                    'cag' : 'gln',
-                    'cat' : 'his',
-                    'cac' : 'his',
-                    'aat' : 'asn',
-                    'aac' : 'asn',
-                    'tct' : 'ser',
-                    'tcc' : 'ser',
-                    'tca' : 'ser',
-                    'tcg' : 'ser',
-                    'agt' : 'ser',
-                    'agc' : 'ser',
-                    'cgt' : 'arg',
-                    'cgc' : 'arg',
-                    'cga' : 'arg',
-                    'cgg' : 'arg',
-                    'aga' : 'arg',
-                    'agg' : 'arg',
-                    'tgg' : 'trp',
-                    'gct' : 'ala',
-                    'gcc' : 'ala',
-                    'gca' : 'ala',
-                    'gcg' : 'ala',
-                    'tgt' : 'cys',
-                    'tgc' : 'cys',
-                    'ggt' : 'gly',
-                    'ggc' : 'gly',
-                    'gga' : 'gly',
-                    'ggg' : 'gly',
-                    'gat' : 'asp',
-                    'gac' : 'asp',
-                    'ttt' : 'phe',
-                    'ttc' : 'phe',
-                    'atg' : 'met',
-                    'tat' : 'tyr',
-                    'tac' : 'tyr',
-                    'gtt' : 'val',
-                    'gtc' : 'val',
-                    'gta' : 'val',
-                    'gtg' : 'val',
-                    'act' : 'thr',
-                    'acc' : 'thr',
-                    'aca' : 'thr',
-                    'acg' : 'thr',
-                    'cct' : 'pro',
-                    'ccc' : 'pro',
-                    'cca' : 'pro',
-                    'ccg' : 'pro',
-                    'att' : 'ile',
-                    'atc' : 'ile',
-                    'ata' : 'ile',
-                    'taa' : 'stop',
-                    'tag' : 'stop',
-                    'tga' : 'stop' }
+import logging
+logger = logging.getLogger(__name__)
 
 from Data import *
 from math import log, exp, sqrt
@@ -250,8 +188,9 @@ def analyzeCodons(seq, data_table, positions = None):
     for i in positions:
         codon = seq[i:i+3]
         codons.append(codon)
-        if data_table.has_key(codon):
-            codons_cai.append(data_table[codon])
+        if data_table:
+            if data_table.has_key(codon):
+                codons_cai.append(data_table[codon])
         else:
             codons_cai.append("NA")
     return [codons, codons_cai]
@@ -1094,22 +1033,24 @@ def SimplePWMPositionOperator(seq, pwmnt, position=None, mutable_region = None, 
     return new_seq
 
 
-def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_table=None, pos=None, n_mut = [1,2]):
+def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_table=None, pos=None,
+                           n_mut=[1,2]):
     '''
         Operator that given a sequence, mutates the sequence randomly
             sequnce: sequence
             mutable_region - a list with all bases that can be mutated
             cds_regions - a list of pairs with begin and end of CDSs - example: [(0,100), (150,300)]
     '''
-    mutableCodonsPosition = [c for c in range(cds_region[0],cds_region[1],3) if set([c,c+1,c+2]).issubset(mutable_region)]
-    mutableUTRPosition = list(set(mutable_region) - set(range(cds_region[0],cds_region[1])))
+    mutableCodonsPosition = [c for c in range(cds_region[0], cds_region[1], 3) if
+                             set([c, c + 1, c + 2]).issubset(mutable_region)]
+    mutableUTRPosition = list(set(mutable_region) - set(range(cds_region[0], cds_region[1])))
 
     if mutableCodonsPosition == [] and mutableUTRPosition == []:
         sys.stderr.write("randomMutationOperator: No codons available for mutation\n")
         return None
     else:
         if keep_aa == True:
-            if (mutableUTRPosition == []) or (mutableCodonsPosition != [] and choice([True,False])):
+            if (mutableUTRPosition == []) or (mutableCodonsPosition != [] and choice([True, False])):
                 return mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos, n_mut)
             else:
                 return mutateAll(sequence, keep_aa, mutableUTRPosition, cds_region, pos, n_mut)
@@ -1117,29 +1058,46 @@ def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_ta
             return mutateAll(sequence, keep_aa, mutable_region, cds_region, pos, n_mut)
 
 
-def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos=None, n_mut = [1,2]):
+def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos=None,
+              n_mut=[1,2]):
+    # TODO: can u increase n_mut to have more?
     if keep_aa == True:
-        result = analyzeCodons(seq=sequence,data_table=cai_table,positions=mutableCodonsPosition)
+        result = analyzeCodons(seq=sequence, data_table=cai_table, positions=mutableCodonsPosition)
 
         n_mutations = choice(n_mut)
+        logger.debug('Making {} mutations'.format(n_mutations))
 
         codons = (result[0])
-        codons_ind = range(0,codons.__len__())
+        codons_ind = range(0, codons.__len__())
 
         mutated = False
         while codons_ind.__len__() != 0 and n_mutations > 0:
-            rnd_ind       = codons_ind.pop(randint(0,codons_ind.__len__()-1))
-            rnd_codon     = codons[rnd_ind]
-            alt_codons = [c for c in aa2codon_table[codon2aa_table[rnd_codon]] if c!= rnd_codon and codon2aa_table[c]!='stop']
+
+            # Randomly pick a codon to mutate
+            rnd_ind = codons_ind.pop(randint(0, codons_ind.__len__() - 1))
+            rnd_codon = codons[rnd_ind]
+
+            # Choose alternative codons
+            # alt_codons = [c for c in aa2codon_table[codon2aa_table[rnd_codon]] if c!= rnd_codon and codon2aa_table[c]!='stop']
+            alt_codons = []
+            for c in aa2codon_table[codon2aa_table[rnd_codon]]:
+                if c != rnd_codon and codon2aa_table[c] != 'stop':
+                    alt_codons.append(c)
+
+            if len(set(alt_codons).intersection(scod)) != 0:
+                raise ValueError('Stop codons in alt_codons')
+
             if alt_codons.__len__() != 0:
                 mutated = True
                 n_mutations -= 1
                 new_codon = choice(alt_codons)
                 real_codon_pos = mutableCodonsPosition[rnd_ind]
-                codon_position = (real_codon_pos-cds_region[0])/3
-                all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cds_region[0],cds_region[1]+1,3))[0]
-                all_codons[codon_position]=new_codon
-                new_seq = sequence[:cds_region[0]] + ''.join(c for c in all_codons) + sequence[cds_region[1]+1:]
+                codon_position = (real_codon_pos - cds_region[0]) / 3
+                all_codons = \
+                analyzeCodons(seq=sequence, data_table=cai_table, positions=range(cds_region[0], cds_region[1] + 1, 3))[
+                    0]
+                all_codons[codon_position] = new_codon
+                new_seq = sequence[:cds_region[0]] + ''.join(c for c in all_codons) + sequence[cds_region[1] + 1:]
                 sequence = new_seq
 
         if mutated == False:
@@ -1213,6 +1171,9 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
             alt_codons = list(k for k,v in cai_table.iteritems() if v>rnd_codon_cai and codon2aa_table[k]!='stop')
         elif keep_aa == False and direction == '-':
             alt_codons = list(k for k,v in cai_table.iteritems() if v<rnd_codon_cai and codon2aa_table[k]!='stop')
+
+        if len(set(alt_codons).intersection(scod)) != 0:
+            raise ValueError('Stop codons in alt_codons')
 
         if alt_codons.__len__() != 0:
             mutated = True

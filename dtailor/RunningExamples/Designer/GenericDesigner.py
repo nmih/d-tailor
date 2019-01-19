@@ -1,15 +1,8 @@
-'''
-Created on Dec 22, 2012
-
-@author: jcg
-'''
-
 import sys
 import os.path as op
 from dtailor.SequenceDesigner import SequenceDesigner
 from dtailor.Features.CAI import CAI
 from dtailor.Features.StructureRNAFold import StructureRNAFold, StructureRNAFoldMFE
-from dtailor.Features.RNADuplexRNAFold import RNADuplexRNAFold, RNADuplexRNAFoldRibosome, RNADuplexRNAFoldMFE
 from dtailor.Functions import validateCDS
 
 
@@ -50,10 +43,7 @@ class GenericDesigner(SequenceDesigner):
             self.cds_region = cds_region
 
     def configureSolution(self, solution):
-        '''
-        Solution configuration
-        '''
-                
+
         if not solution.sequence:
             return 0
 
@@ -64,49 +54,30 @@ class GenericDesigner(SequenceDesigner):
         # This should always be true unless you want to make mutant proteins
         solution.keep_aa = self.keep_aa
 
-        # TODO: loop over self.features (input as "design" and saved when SequenceDesigner is init and add features using the info in that
-        # Design param will have more stuff in it like so
-        # design_param = {
-        #     "mfeStructureRNAFoldMFE": {
-        #         'feattype'      : 'MFE',
-        #         'type'          : 'REAL',
-        #         'mutable_region': (0, 30),
-        #         'thresholds'    : mfe_levels},
-        #     "cai_rampCAI"           : {
-        #         'feattype'      : 'CAI',
-        #         'type'          : 'REAL',
-        #         'mutable_region': (0, 30),
-        #         'thresholds'    : cai_levels},
-        #     "cai_restCAI"           : {
-        #         'feattype'      : 'CAI',
-        #         'type'          : 'REAL',
-        #         'mutable_region': (30, len(sequence)),
-        #         'thresholds'    : cai_levels}
-        # }
-
-        for feat, params in self.features:
+        for feat, params in self.designMethod.features.items():
             if params['feattype'] == 'CAI':
-                a_feature = CAI(solution=solution,
-                                label=feat,
-                                cai_table=self.cai_table,
-                                args={'cai_range'     : (params['mutable_region'][0],
-                                                         params['mutable_region'][1]),
-                                      'mutable_region': range(params['mutable_region'][0],
-                                                              params['mutable_region'][1])})
-            elif params['feattype'] = 'MFE':
-                a_feature = StructureRNAFold(solution=solution,
-                                             label=feat,
-                                             args={'structure_range': (params['mutable_region'][0],
-                                                                       params['mutable_region'][1]),
-                                                   'mutable_region' : range(params['mutable_region'][0],
-                                                                            params['mutable_region'][1])})
+                a_feature = CAI(
+                        solution=solution,
+                        label=feat,
+                        cai_table=self.cai_table,
+                        args={'cai_range'     : (params['mutable_region'][0],
+                                                 params['mutable_region'][1]),
+                              'mutable_region': range(params['mutable_region'][0],
+                                                      params['mutable_region'][1])})
+            elif params['feattype'] == 'StructureRNAFoldMFE':
+                a_feature = StructureRNAFold(
+                        solution=solution,
+                        label=feat,
+                        args={'structure_range': (params['mutable_region'][0],
+                                                  params['mutable_region'][1]),
+                              'mutable_region' : range(params['mutable_region'][0],
+                                                       params['mutable_region'][1])})
                 st_mfe = StructureRNAFoldMFE(structureObject=a_feature)
                 a_feature.add_subfeature(st_mfe)
             else:
                 print('Feature {} not supported yet'.format(feat))
 
             solution.add_feature(a_feature)
-
 
     def validateSolution(self, solution):
         '''

@@ -23,6 +23,8 @@ class DBSQLite(DBAbstract):
         self.designMethod = designMethod
         self.seedSequence = seedSequence
         self.seedId = str(uuid4().int)
+
+        self.new_features_list = [feature + param['feattype'] for feature, param in self.designMethod.features.items()]
         
         #SQL queries buffers
         self.des_solutions = {}
@@ -43,6 +45,8 @@ class DBSQLite(DBAbstract):
         #Register worker
         self.worker_id = str(uuid4().int)        
         self.registerWorker()
+
+
         
 
     def DBInit(self):
@@ -55,13 +59,13 @@ class DBSQLite(DBAbstract):
         pass        
         
         #Design Dynamic tables
-        features_fields = ''.join([feature+"Level TEXT, " for feature in self.designMethod.featuresList])
+        features_fields = ''.join([feature+"Level TEXT, " for feature in self.new_features_list])
         
         table_ds = "create table desired_solution(des_solution_id TEXT PRIMARY KEY,"+features_fields+\
                    "status TEXT,worker_id TEXT,start_time TEXT,FOREIGN KEY(worker_id) REFERENCES worker(worker_id));"
         
-        features_values_fields = ''.join([feature+" "+self.designMethod.features[feature]['type']+", " for feature in self.designMethod.featuresList])
-        features_level_position_fields = ''.join([feature+"Position "+self.designMethod.features[feature]['type']+", " for feature in self.designMethod.featuresList])
+        features_values_fields = ''.join([feature+" "+'REAL'+", " for feature in self.new_features_list])
+        features_level_position_fields = ''.join([feature+"Position "+'REAL'+", " for feature in self.new_features_list])
                            
         table_gs = "create table generated_solution(generated_solution_id TEXT PRIMARY KEY, des_solution_id TEXT, sequence TEXT,"+features_values_fields+features_fields+features_level_position_fields+\
                    "worker_id TEXT, FOREIGN KEY(worker_id) REFERENCES worker(worker_id));"
@@ -85,7 +89,7 @@ class DBSQLite(DBAbstract):
         #Desired Solutions DB
         n_features = self.designMethod.n_features
         all_comb = [tuple(d_sol.split('.')) + (d_sol,) for d_sol in self.designMethod.listDesigns]
-        features_levels_fields = ''.join([feature+"Level, " for feature in self.designMethod.featuresList])
+        features_levels_fields = ''.join([feature+"Level, " for feature in self.new_features_list])
                  
         sql = "insert into desired_solution("+features_levels_fields+"des_solution_id,status, worker_id, start_time) \
                                      values("+"?,"*(n_features+1)+"'WAITING',NULL,NULL);"
@@ -203,7 +207,7 @@ class DBSQLite(DBAbstract):
         self.cur.execute("select * from desired_solution where des_solution_id=?",(desired_solution_id,))
         return self.cur.fetchone()['status'] == "DONE"
     
-    def DBInsertSolution(self,solution,desired_solution_id=""):
+    def DBInsertSolution(self, solution, desired_solution_id=""):
         '''
         Insert solution into database
         returns: Nothing
@@ -215,7 +219,8 @@ class DBSQLite(DBAbstract):
         else:
             self.gen_solutions_id[solution.solid] = '1'
 
-        key = '.'.join([str(solution.levels[feature + 'Level']) for feature in self.designMethod.featuresList])
+        # key = '.'.join([str(solution.levels[feature + param['feattype'] + 'Level']) for feature, param in self.designMethod.features.items()])
+        key = '.'.join([str(solution.levels[feature + 'Level']) for feature in self.new_features_list])
 
         if not self.designMethod.listDesigns == []:  # RandomSampling mode does not have desired targets
             if desired_solution_id == "":  # Worker found solution for something it WASN'T looking for
@@ -243,7 +248,7 @@ class DBSQLite(DBAbstract):
         dict_with_values.update({(feature + 'Position'): self.calculateRelativeLevel(feature,
                                                                                      solution.levels[feature + 'Level'],
                                                                                      solution.scores[feature]) for
-                                 feature in self.designMethod.features})
+                                 feature in self.new_features_list})
 
         self.gen_solutions_sql.append(dict_with_values)
         
@@ -271,8 +276,8 @@ class DBSQLite(DBAbstract):
         self.des_solutions_sql[:] = [] #empty list
         
         # generated solutions
-        features_fields = ','.join([feature+", "+feature+"Level, "+feature+"Position" for feature in self.designMethod.features])
-        features_values_fields = ','.join([":"+feature+", :"+feature+"Level, :"+feature+"Position" for feature in self.designMethod.features])
+        features_fields = ','.join([feature+", "+feature+"Level, "+feature+"Position" for feature in self.new_features_list])
+        features_values_fields = ','.join([":"+feature+", :"+feature+"Level, :"+feature+"Position" for feature in self.new_features_list])
                            
         sql = "insert into generated_solution(generated_solution_id, des_solution_id, sequence, "+features_fields+",worker_id) \
                                     values(:generated_solution_id, :des_solution_id, :sequence, "+features_values_fields+", :worker_id);"                            
@@ -283,7 +288,7 @@ class DBSQLite(DBAbstract):
                         
         euc_dist = 0
 
-        for feature in self.designMethod.features:            
+        for feature in self.new_features_list:
             if levels_sol2[feature+'Level']=='?' or sol1[feature+'Level']=='?':
                 #d = int(max(self.designMethod.thresholds[feature].keys()))
                 d=1

@@ -71,5 +71,6 @@ class CustomDesign(Design):
 
     def __init__(self, featuresObj, targets=[]):
         Design.__init__(self, featuresObj)
+        self.thresholds = {feature+featuresObj[feature]['feattype']: featuresObj[feature]['thresholds'] for feature in featuresObj.keys()}
         self.listDesigns = targets
         self.nDesigns = self.listDesigns.__len__()

@@ -12,6 +12,9 @@ from dtailor.Functions import hammingDistance, pick_random_tuple
 from math import exp, sqrt
 import sys
 import os
+import logging
+logger = logging.getLogger(__name__)
+
 
 class SequenceDesigner(object):
     
@@ -21,16 +24,18 @@ class SequenceDesigner(object):
     
     def __init__(self, name, seed, design, dbfile, root_dir, createDB=True):
         
-        self.name           = name
-        self.designMethod   = design
-        self.dbfile         = dbfile
-        self.solutionsHash  = {} 
-        self.max_iterations = 100 #maximum number of tries allowed to find desired solution
-        self.max_sol_counter= 100000 
-        self.temp_ON        = True
-        self.temp_init      = 100
-        self.temp_schedule  = 0.79
-        self.root_dir  = root_dir
+        self.name = name
+        self.designMethod = design
+        self.dbfile = dbfile
+        self.solutionsHash = {}
+        self.max_iterations = 100  # maximum number of tries allowed to find desired solution
+        self.max_sol_counter = 100000
+        self.temp_ON = True
+        self.temp_init = 100
+        self.temp_schedule = 0.79
+        self.root_dir = root_dir
+
+        self.new_features_list = [feature + param['feattype'] for feature, param in self.designMethod.features.items()]
 
         self.dbconnection = DBSQLite(dbfile=dbfile,designMethod=design,initialize=createDB,seedSequence=seed)
         
@@ -82,7 +87,7 @@ class SequenceDesigner(object):
                 
         euc_dist = 0
         
-        for feature in self.designMethod.features:            
+        for feature in self.new_features_list:
             if levels_sol2[feature+'Level']=='?' or levels_sol1[feature+'Level']=='?':
                 d=1
             elif int(levels_sol2[feature+'Level'])==int(levels_sol1[feature+'Level']):
@@ -112,171 +117,178 @@ class SequenceDesigner(object):
                           sequence=self.dbconnection.seedSequence,
                           design=self.designMethod,
                           project_dir=os.path.join(self.root_dir, self.dbconnection.seedId))
+
         self.configureSolution(master)
         self.validateSolution(master)
         solution = master
 
-        print('Starting scores:')
-        print(master.scores)
-        print(master.levels)
-        
+        logger.info('Starting scores:')
+        logger.info(master.scores)
+        logger.info(master.levels)
+
         if not master.valid:
             raise Exception("Seed inserted is not a valid sequence!")
-        
+
         self.dbconnection.DBInsertSolution(master)
         self.solutionsHash[master.solid] = master
-        
+
         all_combinations_found = False
-    
-        while not all_combinations_found and sol_counter <= self.max_sol_counter:          
-            iteration = 0                        
-            
-            if time()-last_timepoint >= 60: #Print statistics every 1 minute
-                print "time elapsed: %.2f (s) \t solutions generated: %d \t rate (last min.): %0.2f sol/s  \t rate (overall): %0.2f sol/s" % ((time() - start_time),sol_counter,(sol_counter-last_counter)/(time()-last_timepoint),sol_counter/(time() - start_time))
+
+        while not all_combinations_found and sol_counter <= self.max_sol_counter:
+            iteration = 0
+
+            if time() - last_timepoint >= 60:  # Print statistics every 1 minute
+                logger.info("Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
+                (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
+                sol_counter / (time() - start_time)))
                 last_counter = sol_counter
-                last_timepoint = time()     
-                    
-            # Retrieve some desired solution (i.e. a particular combination of features that was not yet found)                    
-            desired_solution = self.dbconnection.DBGetDesiredSolution()            
-                    
-            if desired_solution == None: #There are no more desired solutions                
-                                
-                if self.designMethod.listDesigns!=[]: #All desired combinations were found                   
+                last_timepoint = time()
+
+                # Retrieve some desired solution (i.e. a particular combination of features that was not yet found)
+            desired_solution = self.dbconnection.DBGetDesiredSolution()
+
+            if desired_solution == None:  # There are no more desired solutions
+
+                if self.designMethod.listDesigns != []:  # All desired combinations were found
                     all_combinations_found = True
                     break
             else:
                 initial_dist = self.distanceBetweenSolutions(master, desired_solution)
-                print "looking for combination: " , desired_solution['des_solution_id']                                                                
-                desired_solution_id = desired_solution['des_solution_id']            
-            
+                logger.info("Looking for combination: {}".format(desired_solution['des_solution_id']))
+                desired_solution_id = desired_solution['des_solution_id']
+
             """
             parent = master
             solution = parent
             """
-            
-            #Choose stochastically a close solution to the desired one
-            if choice([True,True,True,True,True,True,True,False]):
+
+            # Choose stochastically a close solution to the desired one
+            if choice([True, True, True, True, True, True, True, False]):
                 closestSolution = self.dbconnection.DBGetClosestSolution(desired_solution)
             else:
                 closestSolution = self.dbconnection.DBGetClosestSolution(None)
-                    
+
             if closestSolution != None:
-                #print "SolutionIterator: Found close sequence, starting from here..."
+                # print "SolutionIterator: Found close sequence, starting from here..."
                 if self.solutionsHash.has_key(closestSolution['generated_solution_id']):
                     parent = self.solutionsHash[closestSolution['generated_solution_id']]
                 else:
-                    parent = Solution(sol_id=closestSolution['generated_solution_id'],sequence=closestSolution['sequence'],design=self.designMethod)
+                    parent = Solution(sol_id=closestSolution['generated_solution_id'],
+                                      sequence=closestSolution['sequence'], design=self.designMethod)
                     self.configureSolution(parent)
-                    self.validateSolution(parent)                                                        
-                    
+                    self.validateSolution(parent)
+
                 solution = parent
             else:
-                #print "SolutionIterator: Starting from master sequence"
+                # print "SolutionIterator: Starting from master sequence"
                 parent = master
-                solution = parent            
-            
-            found = False       
+                solution = parent
+
+            found = False
             old_solution = solution
-            
+
             # Sequence evolution cycle
-            while not solution.checkSolution(desired_solution) and solution.valid and iteration!=self.max_iterations and not found and not all_combinations_found:
-                
-                if solution != parent: 
+            while not solution.checkSolution(desired_solution) and solution.valid and iteration != self.max_iterations and not found and not all_combinations_found:
+
+                if solution != parent:
                     self.dbconnection.DBInsertSolution(solution)
-                    self.solutionsHash[solution.solid] = solution ### Cache for rapid access
-                    sol_counter += 1            
-                
-                #generate next solution                                
+                    self.solutionsHash[solution.solid] = solution  ### Cache for rapid access
+                    sol_counter += 1
+
+                    # generate next solution
                 if selection == "neutral":
-                    solution = choice([parent,solution])
-                elif selection == "directional":                    
+                    solution = choice([parent, solution])
+                elif selection == "directional":
                     if self.designMethod.listDesigns != []:
                         dist_old = self.distanceBetweenSolutions(old_solution, desired_solution)
-                        dist_cur = self.distanceBetweenSolutions(solution, desired_solution)                    
-                        
-                        if dist_old < dist_cur:                            
-                            solution = old_solution                                       
+                        dist_cur = self.distanceBetweenSolutions(solution, desired_solution)
+
+                        if dist_old < dist_cur:
+                            solution = old_solution
                     pass
                 elif selection == "temperature":
                     if self.designMethod.listDesigns != []:
                         dist_old = self.distanceBetweenSolutions(old_solution, desired_solution)
                         dist_cur = self.distanceBetweenSolutions(solution, desired_solution)
-                        
-                        delta = dist_cur - dist_old                    
-                    
+
+                        delta = dist_cur - dist_old
+
                         try:
-                            prob = min([exp(-delta/(self.temp_init*(self.temp_schedule**iteration))),1])
+                            prob = min([exp(-delta / (self.temp_init * (self.temp_schedule ** iteration))), 1])
                         except OverflowError:
                             prob = 0 if delta > 0 else 1
-                        
-                        solution = pick_random_tuple([(old_solution,1-prob),(solution,prob)])
-                        
+
+                        solution = pick_random_tuple([(old_solution, 1 - prob), (solution, prob)])
+
                         if solution != old_solution and delta > 0:
-                            accepted = accepted+1                        
-                                   
+                            accepted = accepted + 1
+
                     pass
                 else:
-                    #use current solution as parent for next round of mutations
+                    # use current solution as parent for next round of mutations
                     sys.stderr.write("Selection option selected is not available, using 'directional' instead...\n")
                     selection = 'directional'
-                    pass            
-                
-                self.additionalConfigurationPreMutation(solution)                                    
-                   
+                    pass
+
+                self.additionalConfigurationPreMutation(solution)
+
                 old_solution = solution
                 solution = solution.mutate(desired_solution)
-                
+
                 # No solution found
                 if solution == None or solution.sequence == None:
-                    solution = None                    
-                    break                
-                
+                    solution = None
+                    break
+
                 self.configureSolution(solution)
                 self.validateSolution(solution)
-                
-                
-                self.additionalConfigurationPostMutation(solution)                                                                                                   
-                
-                #go to next iteration
-                iteration+=1 
-                
-                #check if my desired solution was already found
-                if self.designMethod.listDesigns != [] and iteration % (self.max_iterations/2) == 0:
+
+                self.additionalConfigurationPostMutation(solution)
+
+                # go to next iteration
+                iteration += 1
+
+                # check if my desired solution was already found
+                if self.designMethod.listDesigns != [] and iteration % (self.max_iterations / 2) == 0:
                     found = self.dbconnection.DBCheckDesign(desired_solution_id)
-                    
-                if self.designMethod.listDesigns==[]:                                                            
-                    #Stops when number generated solutions is equal to the desired sample size
+
+                if self.designMethod.listDesigns == []:
+                    # Stops when number generated solutions is equal to the desired sample size
                     if sol_counter >= self.designMethod.nDesigns:
                         all_combinations_found = True
-                        print "RandomSampling: %s solutions generated." % (sol_counter)    
-                        
-                
-            #insert solution in the DB
+                        print "RandomSampling: %s solutions generated." % (sol_counter)
+
+                        # insert solution in the DB
             if solution != None and solution.checkSolution(desired_solution) and solution != parent and solution.valid:
-                print "Solution found... inserting into DB..."
+                logger.info("Solution found for {}, inserting into DB".format(desired_solution['des_solution_id']))
                 self.dbconnection.DBInsertSolution(solution, desired_solution_id)
                 self.solutionsHash[solution.solid] = solution
                 sol_counter += 1
             elif found == True:
-                print "Solution already found by other worker" 
+                logger.debug("Solution already found by other worker")
             else:
                 if self.designMethod.listDesigns != [] and not all_combinations_found:
-                    print "No solution could be found..."
-                    self.dbconnection.DBChangeStatusDesiredSolution(desired_solution_id,'WAITING')
+                    logger.info("No solution could be found for {}".format(desired_solution['des_solution_id']))
+                    self.dbconnection.DBChangeStatusDesiredSolution(desired_solution_id, 'WAITING')
 
-        #set worker as finished
+        # set worker as finished
         self.dbconnection.DBCloseConnection()
-        
-        if len(self.designMethod.listDesigns)==1:
+
+        if len(self.designMethod.listDesigns) == 1:
             print "\n###########################"
             print "# Optimized solution:"
             print "# ID: ", solution.solid
             print "# Sequence: ", solution.sequence
-            print "# Scores: ", [ feat+": "+str(solution.scores[feat]) for feat in self.designMethod.featuresList] 
-            print "# Levels: ", [ feat+"Level: "+str(solution.levels[feat+"Level"]) for feat in self.designMethod.featuresList]
+            print "# Scores: ", [feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]
+            print "# Levels: ", [feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in
+                                 self.new_features_list]
             print "# Number of generated solutions: ", sol_counter
             print "# Distance to seed: ", hammingDistance(master.sequence, solution.sequence)
-            print "###########################\n"            
-        
-        print "Program finished, all combinations were found..."
-        return(sol_counter,hammingDistance(master.sequence, solution.sequence),initial_dist)    
+            print "###########################\n"
+
+        logger.info("Program finished, all combinations were found!")
+        logger.info(
+            "Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
+                (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
+                sol_counter / (time() - start_time)))
+        return (sol_counter, hammingDistance(master.sequence, solution.sequence), initial_dist)

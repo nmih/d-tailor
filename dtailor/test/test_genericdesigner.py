@@ -3,8 +3,9 @@ import os.path as op
 from dtailor.RunningExamples.Designer.GenericDesigner import GenericDesigner
 from dtailor.DesignOfExperiments.Design import CustomDesign
 
+
 @pytest.fixture(scope='module')
-def gen_designer(design_params, targets, cai_table, test_sequence):
+def gen_designer(design_params, targets, pk_cai_table, test_sequence):
     des = CustomDesign(featuresObj=design_params,
                        targets=targets)
 
@@ -15,7 +16,7 @@ def gen_designer(design_params, targets, cai_table, test_sequence):
             name=name,
             seed=seed,
             design=des,
-            cai_table=cai_table,
+            cai_table=pk_cai_table,
             root_dir=root_dir,
             mutable_region=None,
             cds_region=None,

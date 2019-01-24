@@ -4,6 +4,8 @@ from dtailor.SequenceDesigner import SequenceDesigner
 from dtailor.Features.CAI import CAI
 from dtailor.Features.StructureRNAFold import StructureRNAFold, StructureRNAFoldMFE
 from dtailor.Functions import validateCDS
+import logging
+logger = logging.getLogger(__name__)
 
 
 class GenericDesigner(SequenceDesigner):
@@ -75,7 +77,7 @@ class GenericDesigner(SequenceDesigner):
                 st_mfe = StructureRNAFoldMFE(structureObject=a_feature)
                 a_feature.add_subfeature(st_mfe)
             else:
-                print('Feature {} not supported yet'.format(feat))
+                logger.error('Feature {} not supported yet'.format(feat))
 
             solution.add_feature(a_feature)
 

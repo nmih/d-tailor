@@ -1,4 +1,5 @@
 import pytest
+from pkg_resources import resource_filename
 
 
 _mfe_levels = {'1': (-9999, -6.3),
@@ -82,12 +83,12 @@ _cai_table = {'aaa': 1.0,
 
 
 @pytest.fixture(scope='module')
-def mfe_levels():
+def pk_mfe_levels():
     return _mfe_levels
 
 
 @pytest.fixture(scope='module')
-def cai_levels():
+def pk_cai_levels():
     return _cai_levels
 
 
@@ -97,7 +98,7 @@ def targets():
 
 
 @pytest.fixture(scope='module')
-def cai_table():
+def pk_cai_table():
     return _cai_table
 
 @pytest.fixture(scope='module')
@@ -124,3 +125,8 @@ def design_params(test_sequence):
             'mutable_region': (33, len(test_sequence)),
             'thresholds'    : _cai_levels}
     }
+
+
+@pytest.fixture(scope='module')
+def pk_cds_fasta():
+    return resource_filename(__name__, 'test_files/181218-pk_cds_cleaned_ids_TRUNCATED.fna')

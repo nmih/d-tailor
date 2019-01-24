@@ -2,17 +2,26 @@ from dtailor.SequenceAnalyzer import SequenceAnalyzer
 
 from dtailor.Features.CAI import CAI
 from dtailor.Features.StructureRNAFold import StructureRNAFold, StructureRNAFoldMFE
-from dtailor.Features.RNADuplexRNAFold import RNADuplexRNAFold, RNADuplexRNAFoldRibosome, RNADuplexRNAFoldMFE
-
 from dtailor.Functions import validateCDS
 
 
 class AllAndRampAnalyzer(SequenceAnalyzer):
-    '''
-    Class to analyze CAI and RNA structure
-    '''
+    """Class to analyze the entire sequence, the ramp (defined in ramp_from_to), and the rest of the sequence. CAI is
+    calculated for all three types, while MFE (minimum folding energy of the RNA secondary structure) is calculated
+    for the ramp only.
+    """
 
     def __init__(self, input_file, input_type, cai_table, ramp_from_to, root_dir):
+        """Initialize the analyzer.
+
+        Args:
+            input_file (str): Path to genome file
+            input_type (str): File type of the genome file
+            cai_table (dict): Precalculated CAI table for this genome file
+            ramp_from_to (tuple): Start and end of the ramp, 0-indexed
+            root_dir (str): Path to directory where output files will be stored (mostly temporary files for RNA calcs)
+        """
+
         SequenceAnalyzer.__init__(self,
                                   input_file,
                                   input_type,
@@ -28,7 +37,7 @@ class AllAndRampAnalyzer(SequenceAnalyzer):
 
             # CAI - entire sequence
             cai_all_obj = CAI(solution=solution,
-                              label="cai_all",
+                              label="all",
                               cai_table=self.cai_table,
                               args={'cai_range'     : (0, len(solution.sequence)),
                                     'mutable_region': range(0, len(solution.sequence))})
@@ -36,7 +45,7 @@ class AllAndRampAnalyzer(SequenceAnalyzer):
 
             # CAI - ramp only
             cai_ramp_obj = CAI(solution=solution,
-                               label="cai_ramp",
+                               label="ramp",
                                cai_table=self.cai_table,
                                args={'cai_range'     : (0, self.ramp_from_to[1]),
                                      'mutable_region': range(0, self.ramp_from_to[1])})
@@ -44,7 +53,7 @@ class AllAndRampAnalyzer(SequenceAnalyzer):
 
             # CAI - not ramp only
             cai_rest_obj = CAI(solution=solution,
-                               label="cai_rest",
+                               label="rest",
                                cai_table=self.cai_table,
                                args={'cai_range'     : (self.ramp_from_to[1], len(solution.sequence)),
                                      'mutable_region': range(self.ramp_from_to[1], len(solution.sequence))})
@@ -70,7 +79,7 @@ class AllAndRampAnalyzer(SequenceAnalyzer):
             # print solution.scores['utrStructureRNAFoldMFE'], ',',
             # print solution.scores['cdsCAI']
 
-            return {'mfeStructureRNAFoldMFE': solution.scores['mfeStructureRNAFoldMFE'],
-                    'cai_allCAI': solution.scores['cai_allCAI'],
-                    'cai_rampCAI': solution.scores['cai_rampCAI'],
-                    'cai_restCAI': solution.scores['cai_restCAI']}
+            return {'mfe'    : solution.scores['mfeStructureRNAFoldMFE'],
+                    'allCAI' : solution.scores['allCAI'],
+                    'rampCAI': solution.scores['rampCAI'],
+                    'restCAI': solution.scores['restCAI']}

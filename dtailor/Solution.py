@@ -43,7 +43,9 @@ class Solution:
         self.valid = True
         self.project_dir = project_dir
 
-        self.new_features_list = [feature + param['feattype'] for feature, param in self.designMethod.features.items()]
+        self.new_features_list = []
+        if design:
+            self.new_features_list = [feature + param['feattype'] for feature, param in self.designMethod.features.items()]
         self.cai_table = None
 
     # def add_feature(self, feature):

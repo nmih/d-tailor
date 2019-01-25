@@ -80,7 +80,7 @@ def randomMutation(nucleotide):
 def randomSequence(size):
     sequence = ""
 
-    for i in xrange(size):
+    for i in range(size):
         sequence += choice(bases)
 
     return sequence
@@ -1069,7 +1069,7 @@ def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, p
         logger.debug('Making {} mutations'.format(n_mutations))
 
         codons = (result[0])
-        codons_ind = range(0, codons.__len__())
+        codons_ind = list(range(0, codons.__len__()))
 
         mutated = False
         while codons_ind.__len__() != 0 and n_mutations > 0:
@@ -1093,7 +1093,7 @@ def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, p
                 n_mutations -= 1
                 new_codon = choice(alt_codons)
                 real_codon_pos = mutableCodonsPosition[rnd_ind]
-                codon_position = (real_codon_pos - cds_region[0]) / 3
+                codon_position = int((real_codon_pos - cds_region[0]) / 3)
                 all_codons = \
                 analyzeCodons(seq=sequence, data_table=cai_table, positions=range(cds_region[0], cds_region[1] + 1, 3))[
                     0]
@@ -1155,7 +1155,7 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
 
     codons = (result[0])
     codons_cai = (result[1])
-    codons_ind = range(0,codons.__len__())
+    codons_ind = list(range(0,codons.__len__()))
 
     while not mutated and codons_ind.__len__() != 0:
 
@@ -1169,9 +1169,9 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
         elif keep_aa == True and direction == '-':
             alt_codons = [c for c in aa2codon_table[codon2aa_table[rnd_codon]] if c!= rnd_codon and cai_table[c] < rnd_codon_cai and codon2aa_table[c]!='stop']
         elif keep_aa == False and direction == '+':
-            alt_codons = list(k for k,v in cai_table.iteritems() if v>rnd_codon_cai and codon2aa_table[k]!='stop')
+            alt_codons = list(k for k,v in cai_table.items() if v>rnd_codon_cai and codon2aa_table[k]!='stop')
         elif keep_aa == False and direction == '-':
-            alt_codons = list(k for k,v in cai_table.iteritems() if v<rnd_codon_cai and codon2aa_table[k]!='stop')
+            alt_codons = list(k for k,v in cai_table.items() if v<rnd_codon_cai and codon2aa_table[k]!='stop')
 
         if len(set(alt_codons).intersection(scod)) != 0:
             raise ValueError('Stop codons in alt_codons')
@@ -1188,7 +1188,7 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
         #print "CAI operator: old_codon -> " + str(rnd_codon)
         #print "CAI operator: new_codon -> " + str(new_codon)
         real_codon_pos = mutableCodonsPosition[rnd_ind]
-        codon_position = (real_codon_pos-cai_range[0])/3
+        codon_position = int((real_codon_pos-cai_range[0])/3)
         all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cai_range[0],cai_range[1]+1,3))[0]
         all_codons[codon_position]=new_codon
 
@@ -1238,9 +1238,9 @@ def SimpleHydropathyIndexOperator(sequence, hi_range, keep_aa, mutable_region, c
         elif keep_aa == True and direction == '-':
             alt_codons = [c for c in codons_list if c!= rnd_codon and hydropathy_index_table[c] < rnd_codon_hi and codon2aa_table[c]!='stop' and hammingDistance(c, rnd_codon)==1]
         elif keep_aa == False and direction == '+':
-            alt_codons = list(k for k,v in cai_table.iteritems() if v>rnd_codon_hi and codon2aa_table[k]!='stop')
+            alt_codons = list(k for k,v in cai_table.items() if v>rnd_codon_hi and codon2aa_table[k]!='stop')
         elif keep_aa == False and direction == '-':
-            alt_codons = list(k for k,v in cai_table.iteritems() if v<rnd_codon_hi and codon2aa_table[k]!='stop')
+            alt_codons = list(k for k,v in cai_table.items() if v<rnd_codon_hi and codon2aa_table[k]!='stop')
 
         if alt_codons.__len__() != 0:
             mutated = True

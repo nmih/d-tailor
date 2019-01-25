@@ -277,13 +277,12 @@ class SequenceDesigner(object):
         if len(self.designMethod.listDesigns) == 1:
             print("\n###########################")
             print("# Optimized solution:")
-            print("# ID: ", solution.solid)
-            print("# Sequence: ", solution.sequence)
-            print("# Scores: ", [feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list])
-            print("# Levels: ", [feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in
-                                 self.new_features_list])
-            print("# Number of generated solutions: ", sol_counter)
-            print("# Distance to seed: ", hammingDistance(master.sequence, solution.sequence))
+            print("# ID: {}".format(solution.solid))
+            print("# Sequence: {}".format(solution.sequence))
+            print("# Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
+            print("# Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
+            print("# Number of generated solutions: {}".format(sol_counter))
+            print("# Distance to seed: {}".format(hammingDistance(master.sequence, solution.sequence)))
             print("###########################\n")
 
         logger.info("Program finished, all combinations were found!")

@@ -60,7 +60,7 @@ def monte_carlo_min_dist(in_seq, pkl_path, pkl_import=False, random_period=5000,
     in_ids = []
     for data in h1:
         #print data
-        if idnbr.has_key(data["des_solution_id"]):
+        if data["des_solution_id"] in idnbr:
             idnbr[data["des_solution_id"]] += 1
         else:
             idnbr[data["des_solution_id"]] = 1
@@ -101,7 +101,7 @@ def monte_carlo_min_dist(in_seq, pkl_path, pkl_import=False, random_period=5000,
             distnt[ids[i]][ids[j]] = sum([1 for k in range(len(seqs_nt[fullid1])) if seqs_nt[fullid1][k]!=seqs_nt[fullid2][k]])        
             total_dist_nt += distnt[ids[i]][ids[j]]
             for id_comb in (ids[i],ids[j]):
-                if idsumnt.has_key(id_comb):
+                if id_comb in idsumnt:
                     idsumnt[id_comb]+=distnt[ids[i]][ids[j]]
                 else:
                     idsumnt[id_comb]=distnt[ids[i]][ids[j]]
@@ -125,7 +125,7 @@ def monte_carlo_min_dist(in_seq, pkl_path, pkl_import=False, random_period=5000,
             # identify max id_comb
             sumidnt = {}
             for id_comb in ids:
-                if sumidnt.has_key(idsumnt[id_comb]):
+                if idsumnt[id_comb] in sumidnt:
                     sumidnt[idsumnt[id_comb]].append(id_comb)
                 else:
                     sumidnt[idsumnt[id_comb]]=[id_comb]
@@ -214,9 +214,9 @@ def get_final_set_feats(seq_in, pkl, seq_out, get_distance=True, verbose=True):
     current_set = {}
     h = csv.DictReader(open(seq_in))
     for data in h:
-        if data.has_key(None):
+        if None in data:
             data.pop(None)
-        if idnbr.has_key(data["des_solution_id"]):
+        if data["des_solution_id"] in idnbr:
             idnbr[data["des_solution_id"]] += 1
         else:
             idnbr[data["des_solution_id"]] = 1
@@ -279,7 +279,7 @@ def get_final_set_feats(seq_in, pkl, seq_out, get_distance=True, verbose=True):
                         fullid2  = "%s_%s" % (ids[j], current_set[ids[j]][j2])
                         if finalid2 == finalid1:
                             distnt[finalid1][finalid2] = 0
-                        elif distnt.has_key(finalid2):
+                        elif finalid2 in distnt:
                             distnt[finalid1][finalid2] = distnt[finalid2][finalid1]
                         else:
                             distnt[finalid1][finalid2] = sum([1 for k in range(len(seqs_nt[fullid1])) if seqs_nt[fullid1][k]!=seqs_nt[fullid2][k]])

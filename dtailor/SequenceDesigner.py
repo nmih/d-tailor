@@ -170,7 +170,7 @@ class SequenceDesigner(object):
 
             if closestSolution != None:
                 # print "SolutionIterator: Found close sequence, starting from here..."
-                if self.solutionsHash.has_key(closestSolution['generated_solution_id']):
+                if closestSolution['generated_solution_id'] in self.solutionsHash:
                     parent = self.solutionsHash[closestSolution['generated_solution_id']]
                 else:
                     parent = Solution(sol_id=closestSolution['generated_solution_id'],
@@ -256,7 +256,7 @@ class SequenceDesigner(object):
                     # Stops when number generated solutions is equal to the desired sample size
                     if sol_counter >= self.designMethod.nDesigns:
                         all_combinations_found = True
-                        print "RandomSampling: %s solutions generated." % (sol_counter)
+                        print("RandomSampling: %s solutions generated." % (sol_counter))
 
                         # insert solution in the DB
             if solution != None and solution.checkSolution(desired_solution) and solution != parent and solution.valid:
@@ -275,16 +275,16 @@ class SequenceDesigner(object):
         self.dbconnection.DBCloseConnection()
 
         if len(self.designMethod.listDesigns) == 1:
-            print "\n###########################"
-            print "# Optimized solution:"
-            print "# ID: ", solution.solid
-            print "# Sequence: ", solution.sequence
-            print "# Scores: ", [feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]
-            print "# Levels: ", [feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in
-                                 self.new_features_list]
-            print "# Number of generated solutions: ", sol_counter
-            print "# Distance to seed: ", hammingDistance(master.sequence, solution.sequence)
-            print "###########################\n"
+            print("\n###########################")
+            print("# Optimized solution:")
+            print("# ID: ", solution.solid)
+            print("# Sequence: ", solution.sequence)
+            print("# Scores: ", [feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list])
+            print("# Levels: ", [feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in
+                                 self.new_features_list])
+            print("# Number of generated solutions: ", sol_counter)
+            print("# Distance to seed: ", hammingDistance(master.sequence, solution.sequence))
+            print("###########################\n")
 
         logger.info("Program finished, all combinations were found!")
         logger.info(

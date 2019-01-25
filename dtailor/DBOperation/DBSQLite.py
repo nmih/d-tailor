@@ -214,7 +214,7 @@ class DBSQLite(DBAbstract):
         '''
         pass
 
-        if self.gen_solutions_id.has_key(solution.solid) or solution.valid == False:
+        if solution.solid in self.gen_solutions_id or solution.valid == False:
             return 0
         else:
             self.gen_solutions_id[solution.solid] = '1'
@@ -224,7 +224,7 @@ class DBSQLite(DBAbstract):
 
         if not self.designMethod.listDesigns == []:  # RandomSampling mode does not have desired targets
             if desired_solution_id == "":  # Worker found solution for something it WASN'T looking for
-                if self.des_solutions.has_key(key):
+                if key in self.des_solutions:
                     desired_solution_id = str(self.des_solutions[key]['des_solution_id'])
                     if self.des_solutions[key]['status'] != 'DONE':
                         self.des_solutions[key]['status'] = 'DONE'

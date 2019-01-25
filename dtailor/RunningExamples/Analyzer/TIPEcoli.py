@@ -15,7 +15,7 @@ wt_csv_file = project_dir+"/testFiles/auxiliaryData/taniguchi_pa_dataset.csv"
 f = open(wt_csv_file, 'r')
 f.readline() #read header
 #HEADER
-print 'name,cdsCAI,cdsBottleneckPosition,cdsBottleneckRelativeStrength,cdsNucleotideContentAT,cdsHydropathyIndex,utrCdsStructureMFE,fivepCdsStructureMFE,threepCdsStructureMFE,PA,mrna,TE'
+print('name,cdsCAI,cdsBottleneckPosition,cdsBottleneckRelativeStrength,cdsNucleotideContentAT,cdsHydropathyIndex,utrCdsStructureMFE,fivepCdsStructureMFE,threepCdsStructureMFE,PA,mrna,TE')
 
 
 
@@ -95,7 +95,7 @@ while True:
         gene_solution.add_feature(st2_obj)
         gene_solution.add_feature(st3_obj)
         
-        print gene_solution.solid + ',' + \
+        print(gene_solution.solid + ',' + \
               str(gene_solution.scores['cdsCAI']) + "," + \
               str(gene_solution.scores['cdsBottleneckPosition']) + "," + \
               str(gene_solution.scores['cdsBottleneckRelativeStrength']) + "," + \
@@ -103,7 +103,7 @@ while True:
               str(gene_solution.scores['cdsHydropathyIndex']) + "," + \
               str(gene_solution.scores['utrCdsStructureMFE']) + "," + \
               str(gene_solution.scores['fivepCdsStructureMFE']) + "," + \
-              str(gene_solution.scores['threepCdsStructureMFE']) + "," + str(gene_pa) + "," + str(gene_mrna) + "," + str(gene_te)                                           
+              str(gene_solution.scores['threepCdsStructureMFE']) + "," + str(gene_pa) + "," + str(gene_mrna) + "," + str(gene_te))
 
     else:
-        print gene_name + ',NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA'
+        print(gene_name + ',NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA')

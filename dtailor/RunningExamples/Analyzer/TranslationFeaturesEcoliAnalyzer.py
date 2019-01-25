@@ -41,11 +41,11 @@ class TranslationFeaturesEcoliAnalyzer(SequenceAnalyzer):
             
     
     def outputStart(self):
-        print "gene_name,sd_hyb_energy,mfe_structure,cai"
+        print("gene_name,sd_hyb_energy,mfe_structure,cai")
     
     def output(self, solution):
         if solution.valid:
-            print ",".join([solution.solid,str(solution.scores['sd16sRNADuplexMFE']),str(solution.scores['utrStructureMFE']),str(solution.scores['cdsCAI'])])
+            print(",".join([solution.solid,str(solution.scores['sd16sRNADuplexMFE']),str(solution.scores['utrStructureMFE']),str(solution.scores['cdsCAI'])]))
 
 if __name__ == '__main__':
     

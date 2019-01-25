@@ -31,9 +31,9 @@ class Structure(Feature):
             self.structurefile      = solution.solid + label
             self.structure_range    = args['structure_range']        
             self.sequence           = solution.sequence[self.structure_range[0]:(self.structure_range[1]+1)]
-            self.mutable_region     = args['mutable_region']   if args.has_key('mutable_region') else solution.mutable_region
-            self.cds_region         = args['cds_region']       if args.has_key('cds_region') else solution.cds_region
-            self.keep_aa            = args['keep_aa']          if args.has_key('keep_aa') else solution.keep_aa
+            self.mutable_region     = args['mutable_region']   if 'mutable_region' in args else solution.mutable_region
+            self.cds_region         = args['cds_region']       if 'cds_region' in args else solution.cds_region
+            self.keep_aa            = args['keep_aa']          if 'keep_aa' in args else solution.keep_aa
             self.set_scores()
             self.set_level()                    
         else: #copy instance
@@ -53,8 +53,8 @@ class Structure(Feature):
     def mutate(self, operator=Functions.SimpleStructureOperator):        
         if not self.targetInstructions:
             return None        
-        ss_bases = None if not self.scores.has_key(self.label+'StructureSingleStrandedBasesList') else self.scores[self.label+'StructureSingleStrandedBasesList']
-        ds_bases = None if not self.scores.has_key(self.label+'StructureDoubleStrandedBasesList') else self.scores[self.label+'StructureDoubleStrandedBasesList']
+        ss_bases = None if not self.label+'StructureSingleStrandedBasesList' in self.scores else self.scores[self.label+'StructureSingleStrandedBasesList']
+        ds_bases = None if not self.label+'StructureDoubleStrandedBasesList' in self.scores else self.scores[self.label+'StructureDoubleStrandedBasesList']
                     
         new_seq = operator(self.solution.sequence, self.structurefile,  self.structure_range, self.mutable_region, self.cds_region, self.targetInstructions['direction'], ss_bases=ss_bases, ds_bases=ds_bases)
         if not new_seq:

@@ -7,7 +7,7 @@ Created on Oct 3, 2011
 import logging
 logger = logging.getLogger(__name__)
 
-from Data import *
+from dtailor.Data import *
 from math import log, exp, sqrt
 from random import randint, choice, random
 import re
@@ -103,7 +103,7 @@ def lin(x, y):
             R^2 Value, sum of squares and mean error
     """
     if len(x) != len(y):
-        raise ValueError, 'unequal length'
+        raise ValueError('unequal length')
     n = len(x)
     sx = sy = sxx = syy = sxy = 0.0
     for i, j in zip(x, y):
@@ -125,7 +125,7 @@ def lin(x, y):
     return a, b, r2, ssq, mean_error
 
 def appendLabelToDict(somedict,label):
-    return dict(map(lambda (key, value): (label+str(key), value), somedict.items()))
+    return dict(map(lambda x: (label+str(x[0]), x[1]), somedict.items()))
 
 
 def average(array):
@@ -190,7 +190,7 @@ def analyzeCodons(seq, data_table, positions = None):
         codon = seq[i:i+3]
         codons.append(codon)
         if data_table:
-            if data_table.has_key(codon):
+            if codon in data_table:
                 codons_cai.append(data_table[codon])
         else:
             codons_cai.append("NA")
@@ -239,7 +239,7 @@ def analyze_hydropathy(seq):
     score = 0
     len_sq = 0
     for i in range(0,len(seq),3):
-        if hydropathy_index_table.has_key(seq[i:i+3]):
+        if seq[i:i+3] in hydropathy_index_table:
             score += (hydropathy_index_table[seq[i:i+3]])
             len_sq += 1
     score /= len_sq
@@ -250,7 +250,7 @@ def analyze_cai(seq, cai_table):
     score = 0
     len_sq = 0
     for i in range(0,len(seq),3):
-        if cai_table.has_key(seq[i:i+3]):
+        if seq[i:i+3] in cai_table:
             score += log(cai_table[seq[i:i+3]])
             len_sq += 1
     score /= len_sq
@@ -470,7 +470,7 @@ def analyze_duplex_mfe_rnafold(filename, project_dir):
         try:
             output = check_output(["tail", "-n 1", rnafold_outfile]).rstrip()
 
-            m = re.search('-?\d+\.\d+',output)
+            m = re.search(r'-?\d+\.\d+',output.decode('utf-8'))
             res = m.group(0)
 
             if res != "":
@@ -694,7 +694,7 @@ def analyze_structure_mfe_rnafold(filename, project_dir):
 
         output = check_output(["tail", "-n 1" , rnafold_outfile]).rstrip()
 
-        m = re.search('-?\d+\.\d+',output)
+        m = re.search(r'-?\d+\.\d+',output.decode('utf-8'))
         data['StructureRNAFoldMFE'] = float(m.group(0))
 
     else:

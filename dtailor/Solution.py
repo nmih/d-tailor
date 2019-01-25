@@ -66,7 +66,7 @@ class Solution:
 
     def add_feature(self, feature):
         featureLabel = feature.label + feature.__class__.__name__
-        if not self.features.has_key(featureLabel):
+        if not featureLabel in self.features:
             self.features[featureLabel] = feature
             # update scores
             self.scores.update(feature.scores)
@@ -111,11 +111,11 @@ class Solution:
             
             rm =  choice(mutable)
             #tomutatefeatures = [k.label+k.__class__.__name__ for k in mutable]                        
-            #print tomutatefeatures
-            #print [self.scores[k] for k in tomutatefeatures]
-            #print [self.levels[k+"Level"] for k in tomutatefeatures]
-            #print [desiredSolution[k+"Level"] for k in tomutatefeatures]
-            #print "mutating... " + rm.label+rm.__class__.__name__
+            #print(tomutatefeatures)
+            #print([self.scores[k] for k in tomutatefeatures])
+            #print([self.levels[k+"Level"] for k in tomutatefeatures])
+            #print([desiredSolution[k+"Level"] for k in tomutatefeatures])
+            #print("mutating... " + rm.label+rm.__class__.__name__)
             
             return rm.mutate()
             #return choice(mutable).randomMutation()

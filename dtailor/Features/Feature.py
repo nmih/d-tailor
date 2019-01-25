@@ -65,7 +65,7 @@ class Feature(object):
             return True
         
         #check if there is a target
-        if not desiredSolution.has_key(self.label+self.__class__.__name__+"Level"):
+        if not self.label+self.__class__.__name__+"Level" in desiredSolution:
             return False
         else:
             target_level = desiredSolution[self.label+self.__class__.__name__+"Level"]
@@ -103,7 +103,7 @@ class Feature(object):
         '''
         
         if self.solution.designMethod != None: #Design mode
-            if self.solution.designMethod.thresholds.has_key(self.label+self.__class__.__name__):
+            if self.label+self.__class__.__name__ in self.solution.designMethod.thresholds:
                 
                 for level_name in self.solution.designMethod.thresholds[self.label+self.__class__.__name__].keys():
                     

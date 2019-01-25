@@ -158,10 +158,10 @@ if __name__ == '__main__':
             design = RandomSampling(["sd16sRNADuplexRNAFoldMFE", "utrStructureRNAFoldMFE", "cdsCAI"], design_param,
                                     int(sys.argv[2]))
         elif sys.argv[1] == "-h":
-            print "Please use one of the following options: "
-            print "TranslationFeaturesEcoliDesigner.py optimization [target]"
-            print "TranslationFeaturesEcoliDesigner.py fullfactorial"
-            print "TranslationFeaturesEcoliDesigner.py randomsampling [sample size]"
+            print("Please use one of the following options: ")
+            print("TranslationFeaturesEcoliDesigner.py optimization [target]")
+            print("TranslationFeaturesEcoliDesigner.py fullfactorial")
+            print("TranslationFeaturesEcoliDesigner.py randomsampling [sample size]")
             sys.exit("")
         else:
             sys.exit("For help use TranslationFeaturesEcoliDesignerRNAFold.py -h\n")

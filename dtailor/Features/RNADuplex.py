@@ -27,14 +27,14 @@ class RNADuplex(Feature):
             self.duplexFile          = str(solution1.solid) + '-' + str(solution2.solid) + label
             self.rnaMolecule1region  = args['rnaMolecule1region']
             self.rnaMolecule1seq     = self.solution.sequence[self.rnaMolecule1region[0]:(self.rnaMolecule1region[1]+1)]
-            self.mutable_region      = args['mutable_region1']   if args.has_key('mutable_region1') else None
-            self.cds_regions         = args['cds_regions1']      if args.has_key('cds_regions1') else None
-            self.keep_aa             = args['keep_aa1']          if args.has_key('keep_aa1') else False
+            self.mutable_region      = args['mutable_region1']   if 'mutable_region1' in args else None
+            self.cds_regions         = args['cds_regions1']      if 'cds_regions1' in args else None
+            self.keep_aa             = args['keep_aa1']          if 'keep_aa1' in args else False
             self.rnaMolecule2region  = args['rnaMolecule2region']
             self.rnaMolecule2seq     = self.solution2.sequence[self.rnaMolecule2region[0]:(self.rnaMolecule2region[1]+1)]
-            self.mutable_region2     = args['mutable_region2']   if args.has_key('mutable_region2') else None
-            self.cds_regions2        = args['cds_regions2']      if args.has_key('cds_regions2') else None
-            self.keep_aa2            = args['keep_aa2']          if args.has_key('keep_aa2') else False
+            self.mutable_region2     = args['mutable_region2']   if 'mutable_region2' in args else None
+            self.cds_regions2        = args['cds_regions2']      if 'cds_regions2' in args else None
+            self.keep_aa2            = args['keep_aa2']          if 'keep_aa2' in args else False
             self.set_scores()
             self.set_level()
         else:
@@ -85,9 +85,9 @@ class RNADuplexRibosome(RNADuplex):
         args.update({ 'rnaMolecule2region' : (0,8) })
         RNADuplex.__init__(self,solution1=solution1, solution2=ribRNA,label=label, args=args)
         self.solution = solution1
-        self.keep_aa          = args['keep_aa'] if args.has_key('keep_aa') else solution1.keep_aa
-        self.mutable_region   = args['mutable_region'] if args.has_key('mutable_region') else solution1.mutable_region
-        self.cds_regions      = args['cds_regions'] if args.has_key('cds_regions') else solution1.mutable_region
+        self.keep_aa          = args['keep_aa'] if 'keep_aa' in args else solution1.keep_aa
+        self.mutable_region   = args['mutable_region'] if 'mutable_region' in args else solution1.mutable_region
+        self.cds_regions      = args['cds_regions'] if 'cds_regions' in args else solution1.mutable_region
             
     
 class RNADuplexMFE(RNADuplex):

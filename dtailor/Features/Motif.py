@@ -32,9 +32,9 @@ class Motif(Feature):
             self.pwm                = args['pwm']
             self.motif_range        = args['motif_range']
             self.sequence           = solution.sequence[self.motif_range[0]:self.motif_range[1]+1]
-            self.mutable_region     = [i-self.motif_range[0] for i in set(range(self.motif_range[0],self.motif_range[1]+1)) & set(args['mutable_region'])] if args.has_key('mutable_region') else solution.mutable_region
-            self.cds_region         = args['cds_region']    if args.has_key('cds_region') else solution.cds_region
-            self.keep_aa            = args['keep_aa']        if args.has_key('keep_aa') else solution.keep_aa        
+            self.mutable_region     = [i-self.motif_range[0] for i in set(range(self.motif_range[0],self.motif_range[1]+1)) & set(args['mutable_region'])] if 'mutable_region' in args else solution.mutable_region
+            self.cds_region         = args['cds_region']    if 'cds_region' in args else solution.cds_region
+            self.keep_aa            = args['keep_aa']        if 'keep_aa' in args else solution.keep_aa
             self.set_scores()
             self.set_level()        
         else: #copy instance
@@ -86,7 +86,7 @@ class MotifScore(Motif):
         currentLevel = self.level
         
         # Check if there's an associated target position
-        if desiredSolution.has_key(self.label+"MotifPositionLevel") and self.solution.levels[self.label+"MotifPositionLevel"] != desiredSolution[self.label+self.__class__.__name__+"Level"]:
+        if self.label+"MotifPositionLevel" in desiredSolution and self.solution.levels[self.label+"MotifPositionLevel"] != desiredSolution[self.label+self.__class__.__name__+"Level"]:
             #first we need to set the right position level
             return False
         else:

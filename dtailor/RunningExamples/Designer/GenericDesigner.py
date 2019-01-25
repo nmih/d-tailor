@@ -18,7 +18,7 @@ class GenericDesigner(SequenceDesigner):
         Args:
             name (str): Identifier of the sequence
             seed (str): DNA sequence
-            design (dict): Parameters for design
+            design (Design): Parameters for design
             cai_table (dict): Precalculated CAI table for your organism
             root_dir (str): Output directory for SQL and temp files
             mutable_region (tuple): What can be mutated (0-index)

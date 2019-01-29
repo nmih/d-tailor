@@ -130,7 +130,7 @@ class SequenceDesigner(object):
             raise Exception("Seed inserted is not a valid sequence!")
 
         self.dbconnection.DBInsertSolution(master)
-        self.solutionsHash[master.solid] = master
+        # self.solutionsHash[master.solid] = master
 
         all_combinations_found = False
 
@@ -169,16 +169,21 @@ class SequenceDesigner(object):
                 closestSolution = self.dbconnection.DBGetClosestSolution(None)
 
             if closestSolution != None:
-                # print "SolutionIterator: Found close sequence, starting from here..."
-                if closestSolution['generated_solution_id'] in self.solutionsHash:
-                    parent = self.solutionsHash[closestSolution['generated_solution_id']]
-                else:
-                    parent = Solution(sol_id=closestSolution['generated_solution_id'],
-                                      sequence=closestSolution['sequence'], design=self.designMethod)
-                    self.configureSolution(parent)
-                    self.validateSolution(parent)
+                logger.debug("SolutionIterator: Found close sequence, starting from here...")
+                # if closestSolution['generated_solution_id'] in self.solutionsHash:
+                #     parent = self.solutionsHash[closestSolution['generated_solution_id']]
+                # else:
+                parent = Solution(sol_id=closestSolution['generated_solution_id'],
+                                  sequence=closestSolution['sequence'], design=self.designMethod,
+                                  project_dir=os.path.join(self.root_dir, self.dbconnection.seedId))
+                self.configureSolution(parent)
+                self.validateSolution(parent)
 
                 solution = parent
+
+                logger.debug('New scores:')
+                logger.debug(solution.scores)
+                logger.debug(solution.levels)
             else:
                 # print "SolutionIterator: Starting from master sequence"
                 parent = master
@@ -190,9 +195,14 @@ class SequenceDesigner(object):
             # Sequence evolution cycle
             while not solution.checkSolution(desired_solution) and solution.valid and iteration != self.max_iterations and not found and not all_combinations_found:
 
+                if selection == 'directional':
+                    dist_old = self.distanceBetweenSolutions(old_solution, desired_solution)
+                    dist_cur = self.distanceBetweenSolutions(solution, desired_solution)
+
                 if solution != parent:
                     self.dbconnection.DBInsertSolution(solution)
-                    self.solutionsHash[solution.solid] = solution  ### Cache for rapid access
+                    # if dist_old >= dist_cur: # TODO: Only cache if new solution has a smaller distance?
+                    #     self.solutionsHash[solution.solid] = solution  ### Cache for rapid access
                     sol_counter += 1
 
                     # generate next solution
@@ -200,12 +210,12 @@ class SequenceDesigner(object):
                     solution = choice([parent, solution])
                 elif selection == "directional":
                     if self.designMethod.listDesigns != []:
-                        dist_old = self.distanceBetweenSolutions(old_solution, desired_solution)
-                        dist_cur = self.distanceBetweenSolutions(solution, desired_solution)
+                        # dist_old = self.distanceBetweenSolutions(old_solution, desired_solution)
+                        # dist_cur = self.distanceBetweenSolutions(solution, desired_solution)
 
                         if dist_old < dist_cur:
                             solution = old_solution
-                    pass
+                    # pass
                 elif selection == "temperature":
                     if self.designMethod.listDesigns != []:
                         dist_old = self.distanceBetweenSolutions(old_solution, desired_solution)
@@ -223,12 +233,12 @@ class SequenceDesigner(object):
                         if solution != old_solution and delta > 0:
                             accepted = accepted + 1
 
-                    pass
+                    # pass
                 else:
                     # use current solution as parent for next round of mutations
                     sys.stderr.write("Selection option selected is not available, using 'directional' instead...\n")
                     selection = 'directional'
-                    pass
+                    # pass
 
                 self.additionalConfigurationPreMutation(solution)
 
@@ -262,7 +272,7 @@ class SequenceDesigner(object):
             if solution != None and solution.checkSolution(desired_solution) and solution != parent and solution.valid:
                 logger.info("Solution found for {}, inserting into DB".format(desired_solution['des_solution_id']))
                 self.dbconnection.DBInsertSolution(solution, desired_solution_id)
-                self.solutionsHash[solution.solid] = solution
+                # self.solutionsHash[solution.solid] = solution
                 sol_counter += 1
             elif found == True:
                 logger.debug("Solution already found by other worker")

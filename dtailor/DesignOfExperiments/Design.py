@@ -5,7 +5,7 @@ Created on Nov 11, 2012
 """
 
 from itertools import product
-
+from collections import OrderedDict
 
 class Design(object):
     """
@@ -71,6 +71,10 @@ class CustomDesign(Design):
 
     def __init__(self, featuresObj, targets=[]):
         Design.__init__(self, featuresObj)
-        self.thresholds = {feature+featuresObj[feature]['feattype']: featuresObj[feature]['thresholds'] for feature in featuresObj.keys()}
+
+        self.thresholds = OrderedDict()
+        for feature in featuresObj.keys():
+            self.thresholds[feature + featuresObj[feature]['feattype']] = featuresObj[feature]['thresholds']
+
         self.listDesigns = targets
-        self.nDesigns = self.listDesigns.__len__()
+        self.nDesigns = len(targets)

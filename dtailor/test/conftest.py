@@ -1,6 +1,6 @@
 import pytest
 from pkg_resources import resource_filename
-
+from collections import OrderedDict
 
 _mfe_levels = {'1': (-9999, -6.3),
                '2': (-6.3, -4.5),
@@ -109,23 +109,23 @@ def test_sequence():
 
 @pytest.fixture(scope='module')
 def design_params(test_sequence):
-    return {
-        "mfe": {
+    dp = OrderedDict()
+    dp['mfe'] = {
             'feattype'      : 'StructureRNAFoldMFE',
             'type'          : 'REAL',
             'mutable_region': (0, 32),
-            'thresholds'    : _mfe_levels},
-        "ramp"           : {
+            'thresholds'    : _mfe_levels}
+    dp['ramp'] = {
             'feattype'      : 'CAI',
             'type'          : 'REAL',
             'mutable_region': (0, 32),
-            'thresholds'    : _cai_levels},
-        "rest"           : {
+            'thresholds'    : _cai_levels}
+    dp['rest'] = {
             'feattype'      : 'CAI',
             'type'          : 'REAL',
             'mutable_region': (33, len(test_sequence)),
             'thresholds'    : _cai_levels}
-    }
+    return dp
 
 
 @pytest.fixture(scope='module')

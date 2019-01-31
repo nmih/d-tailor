@@ -30,7 +30,7 @@ class Structure(Feature):
             #Specifics of this Feature
             self.structurefile      = solution.solid + label
             self.structure_range    = args['structure_range']        
-            self.sequence           = solution.sequence[self.structure_range[0]:(self.structure_range[1]+1)]
+            self.sequence           = solution.sequence[self.structure_range[0]:self.structure_range[1]]
             self.mutable_region     = args['mutable_region']   if 'mutable_region' in args else solution.mutable_region
             self.cds_region         = args['cds_region']       if 'cds_region' in args else solution.cds_region
             self.keep_aa            = args['keep_aa']          if 'keep_aa' in args else solution.keep_aa

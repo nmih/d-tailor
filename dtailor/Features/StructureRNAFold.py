@@ -7,6 +7,9 @@ Created on Nov 16, 2011
 from dtailor.Features.Feature import Feature
 from dtailor import Functions
 from uuid import uuid4
+import logging
+logger = logging.getLogger(__name__)
+
 
 class StructureRNAFold(Feature):
     """
@@ -29,8 +32,9 @@ class StructureRNAFold(Feature):
             Feature.__init__(self, solution=solution, label=label)
             #Specifics of this Feature
             self.structurefile      = solution.solid + label
-            self.structure_range    = args['structure_range']        
-            self.sequence           = solution.sequence[self.structure_range[0]:(self.structure_range[1]+1)]
+            self.structure_range    = args['structure_range']
+            logger.debug('RNA range set to: {}:{}'.format(self.structure_range[0], self.structure_range[1]))
+            self.sequence           = solution.sequence[self.structure_range[0]:self.structure_range[1]]
             self.mutable_region     = args['mutable_region']   if 'mutable_region' in args else solution.mutable_region
             self.cds_region         = args['cds_region']       if 'cds_region' in args else solution.cds_region
             self.keep_aa            = args['keep_aa']          if 'keep_aa' in args else solution.keep_aa
@@ -47,6 +51,7 @@ class StructureRNAFold(Feature):
             self.scores             = structureObject.scores
                             
     def set_scores(self, scoring_function=Functions.analyze_structure_rnafold):
+        logger.debug('Scoring RNA structure for sequence: {}'.format(self.sequence))
         scoring_function(seq=self.sequence, filename=self.structurefile, project_dir=self.solution.project_dir)
                                                                      
     def mutate(self):        

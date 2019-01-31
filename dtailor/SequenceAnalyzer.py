@@ -17,22 +17,23 @@ class SequenceAnalyzer(object):
     '''
     Initializes class that analyzes sequence features 
     '''
-    
-    def __init__(self, input_file, input_type, root_dir, sep = ","):
+
+    def __init__(self, input_file, input_type, root_dir, sep=","):
 
         self.root_dir = root_dir
         
         if input_type == "CSV":
-            self.list_of_input_sequences = self.readCSV(input_file,sep)
+            self.list_of_input_sequences = self.readCSV(input_file, sep)
         elif input_type == "FASTA": 
             self.list_of_input_sequences = self.readFASTA(input_file)
-        elif input_file == "GENBANK":
+        elif input_type == "GENBANK":
             self.list_of_input_sequences = self.readGENBANK(input_file)
+        elif input_type == 'STRING':
+            self.list_of_input_sequences = [{'name': 'tmp_id', 'sequence': input_file}]
         else:
-            sys.stderr.write("The input type entered is not supported, please use one of the following: [CSV,FASTA,GENBANK]") 
+            sys.stderr.write("The input type entered is not supported, please use one of the following: [CSV,FASTA,GENBANK]")
     
     def readCSV(self,input_file,sep=","):
-        pass
         list_seq = []
         
         reader = DictReader(open(input_file), delimiter=sep, quotechar='"')

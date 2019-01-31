@@ -12,6 +12,7 @@ class GenericDesigner(SequenceDesigner):
     
     def __init__(self, name, seed, design, cai_table, root_dir,
                  mutable_region=None, cds_region=None, keep_aa=True,
+                 check_frame=True, check_start=True, check_end_stop=True, check_within_stop=True,
                  createDB=True):
         """Initialize a project to design a sequence according to design parameters.
 
@@ -43,6 +44,11 @@ class GenericDesigner(SequenceDesigner):
             self.cds_region = (0, len(seed))
         else:
             self.cds_region = cds_region
+
+        self.check_frame = check_frame
+        self.check_start = check_start
+        self.check_end_stop = check_end_stop
+        self.check_within_stop = check_within_stop
 
     def configureSolution(self, solution):
 
@@ -92,7 +98,9 @@ class GenericDesigner(SequenceDesigner):
 
         # Basic validation
         designed_region = solution.sequence
-        valid = validateCDS(designed_region)
+        valid = validateCDS(designed_region,
+                            check_frame=self.check_frame, check_start=self.check_start,
+                            check_end_stop=self.check_end_stop, check_within_stop=self.check_within_stop)
 
         # # No internal Promoters - e coli specific
         # (score, _, _) = Functions.look_for_promoters(designed_region)

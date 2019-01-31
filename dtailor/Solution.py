@@ -9,6 +9,10 @@ from random import choice
 from dtailor.Functions import randomMutationOperator
 from uuid import uuid4
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class Solution:
     '''
     A Solution encapsulates a sequence and their inherent attributes:
@@ -109,13 +113,13 @@ class Solution:
             if mutable == []:
                 return None                    
             
-            rm =  choice(mutable)
-            #tomutatefeatures = [k.label+k.__class__.__name__ for k in mutable]                        
-            #print(tomutatefeatures)
-            #print([self.scores[k] for k in tomutatefeatures])
-            #print([self.levels[k+"Level"] for k in tomutatefeatures])
-            #print([desiredSolution[k+"Level"] for k in tomutatefeatures])
-            #print("mutating... " + rm.label+rm.__class__.__name__)
+            rm = choice(mutable)
+            tomutatefeatures = [k.label+k.__class__.__name__ for k in mutable]
+            logger.debug(tomutatefeatures)
+            logger.debug([self.scores[k] for k in tomutatefeatures])
+            logger.debug([self.levels[k+"Level"] for k in tomutatefeatures])
+            logger.debug([desiredSolution[k+"Level"] for k in tomutatefeatures])
+            logger.debug("mutating... " + rm.label+rm.__class__.__name__)
             
             return rm.mutate()
             #return choice(mutable).randomMutation()

@@ -1066,7 +1066,7 @@ def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, p
         result = analyzeCodons(seq=sequence, data_table=cai_table, positions=mutableCodonsPosition)
 
         n_mutations = choice(n_mut)
-        logger.debug('Making {} mutations'.format(n_mutations))
+        # logger.debug('Making {} mutations'.format(n_mutations))
 
         codons = (result[0])
         codons_ind = list(range(0, codons.__len__()))

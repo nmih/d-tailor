@@ -181,11 +181,18 @@ class SequenceDesigner(object):
 
                 solution = parent
 
-                logger.debug('New scores:')
-                logger.debug(solution.scores)
-                logger.debug(solution.levels)
+                logger.info('SolutionIterator: closest levels:')
+                # logger.debug(solution.scores)
+                want = ''
+                closest_level = ''
+                for k, v in self.designMethod.features.items():
+                    new_key = k + v['feattype'] + 'Level'
+                    want += k + '.'
+                    closest_level += solution.levels[new_key] + '.'
+                logger.info(want.strip('.'))
+                logger.info(closest_level.strip('.'))
             else:
-                # print "SolutionIterator: Starting from master sequence"
+                logger.debug("SolutionIterator: Starting from master sequence")
                 parent = master
                 solution = parent
 

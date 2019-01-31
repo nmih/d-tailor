@@ -6,6 +6,8 @@ Created on Nov 11, 2011
 
 from uuid import uuid4
 from dtailor import Solution, Functions
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Feature(object):
@@ -62,18 +64,22 @@ class Feature(object):
         Function that determines if a target wasn't hit and, if not, updates target instructions 
         '''
         if desiredSolution == None:
+            logger.debug('no desiredSolution')
             return True
         
         #check if there is a target
         if not self.label+self.__class__.__name__+"Level" in desiredSolution:
+            logger.debug(desiredSolution)
+            logger.debug('no target found {}'.format(self.label+self.__class__.__name__+"Level"))
             return False
         else:
             target_level = desiredSolution[self.label+self.__class__.__name__+"Level"]
             
             if target_level == 0:
+                logger.debug('target level == 0')
                 return False        
                         
-            if  target_level != self.level:
+            if target_level != self.level:
                 
                 level_info = self.solution.designMethod.thresholds[self.label+self.__class__.__name__][target_level]
                 
@@ -94,6 +100,7 @@ class Feature(object):
                     
                 return True
 
+            logger.debug('target_level == self.level')
             return False
 
         

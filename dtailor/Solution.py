@@ -115,10 +115,10 @@ class Solution:
             
             rm = choice(mutable)
             tomutatefeatures = [k.label+k.__class__.__name__ for k in mutable]
-            logger.debug(tomutatefeatures)
-            logger.debug([self.scores[k] for k in tomutatefeatures])
-            logger.debug([self.levels[k+"Level"] for k in tomutatefeatures])
-            logger.debug([desiredSolution[k+"Level"] for k in tomutatefeatures])
+            logger.debug('Mutating for goal of increasing: {}'.format(tomutatefeatures))
+            logger.debug('Current scores: {}'.format([self.scores[k] for k in tomutatefeatures]))
+            logger.debug('Current levels: {}'.format([self.levels[k+"Level"] for k in tomutatefeatures]))
+            logger.debug('Desired levels: {}'.format([desiredSolution[k+"Level"] for k in tomutatefeatures]))
             logger.debug("mutating... " + rm.label+rm.__class__.__name__)
             
             return rm.mutate()

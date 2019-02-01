@@ -31,24 +31,28 @@ def validateCDS(cds="", check_frame=True, check_start=True, check_end_stop=True,
     if check_frame:
         if len(cds) % 3 != 0:
             logger.error('CDS length is not a multiple of 3')
+            logger.debug('ERROR: {}'.format(cds))
             return False
 
     # starts with a start codon (ATG, GTG, TTG)
     if check_start:
         if cds[0:3] not in ('atg', 'gtg', 'ttg'):
             logger.error('Sequence does not start with a start codon')
+            logger.debug('ERROR: {}'.format(cds))
             return False
 
     # stop with a stop codon
     if check_end_stop:
         if cds[-3:] not in ('taa', 'tag', 'tga'):
             logger.error('Sequence does not stop with a stop codon')
+            logger.debug('ERROR: {}'.format(cds))
             return False
 
     # stop codon in the middle
     if check_within_stop:
         if len(set([cds[i:i + 3] for i in range(3, len(cds) - 3, 3)]).intersection(['taa', 'tag', 'tga'])) != 0:
             logger.error('Stop codon found within sequence')
+            logger.debug('ERROR: {}'.format(cds))
             return False
 
     return True
@@ -1095,10 +1099,10 @@ def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, p
                 real_codon_pos = mutableCodonsPosition[rnd_ind]
                 codon_position = int((real_codon_pos - cds_region[0]) / 3)
                 all_codons = \
-                analyzeCodons(seq=sequence, data_table=cai_table, positions=range(cds_region[0], cds_region[1] + 1, 3))[
+                analyzeCodons(seq=sequence, data_table=cai_table, positions=range(cds_region[0], cds_region[1], 3))[
                     0]
                 all_codons[codon_position] = new_codon
-                new_seq = sequence[:cds_region[0]] + ''.join(c for c in all_codons) + sequence[cds_region[1] + 1:]
+                new_seq = sequence[:cds_region[0]] + ''.join(c for c in all_codons) + sequence[cds_region[1]:]
                 sequence = new_seq
 
         if mutated == False:
@@ -1189,11 +1193,11 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
         #print "CAI operator: new_codon -> " + str(new_codon)
         real_codon_pos = mutableCodonsPosition[rnd_ind]
         codon_position = int((real_codon_pos-cai_range[0])/3)
-        all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cai_range[0],cai_range[1]+1,3))[0]
+        all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cai_range[0],cai_range[1],3))[0]
         all_codons[codon_position]=new_codon
 
 
-        new_seq = sequence[:cai_range[0]] + ''.join(c for c in all_codons) + sequence[cai_range[1]+1:]
+        new_seq = sequence[:cai_range[0]] + ''.join(c for c in all_codons) + sequence[cai_range[1]:]
         return new_seq
 
 def hammingDistance(seq1,seq2):

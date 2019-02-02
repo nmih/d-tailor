@@ -59,7 +59,7 @@ class Feature(object):
                 
         return targets
 
-    def defineTarget(self,desiredSolution):
+    def defineTarget(self, desiredSolution):
         '''
         Function that determines if a target wasn't hit and, if not, updates target instructions 
         '''
@@ -76,7 +76,7 @@ class Feature(object):
             target_level = desiredSolution[self.label+self.__class__.__name__+"Level"]
             
             if target_level == 0:
-                logger.debug('target level == 0')
+                logger.debug('Target level == 0')
                 return False        
                         
             if target_level != self.level:
@@ -100,7 +100,7 @@ class Feature(object):
                     
                 return True
 
-            logger.debug('target_level == self.level')
+            logger.debug('{}: current level ({}) already equal to target level ({})'.format(self.label, self.level, target_level))
             return False
 
         

@@ -181,7 +181,7 @@ class SequenceDesigner(object):
 
                 solution = parent
 
-                logger.info('SolutionIterator: closest levels:')
+
                 # logger.debug(solution.scores)
                 want = ''
                 closest_level = ''
@@ -189,8 +189,8 @@ class SequenceDesigner(object):
                     new_key = k + v['feattype'] + 'Level'
                     want += k + '.'
                     closest_level += solution.levels[new_key] + '.'
-                logger.info(want.strip('.'))
-                logger.info(closest_level.strip('.'))
+
+                logger.info('SolutionIterator: closest levels ({}): {}'.format(want.strip('.'), closest_level.strip('.')))
             else:
                 logger.debug("SolutionIterator: Starting from master sequence")
                 parent = master
@@ -307,4 +307,5 @@ class SequenceDesigner(object):
             "Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
                 (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
                 sol_counter / (time() - start_time)))
+
         return (sol_counter, hammingDistance(master.sequence, solution.sequence), initial_dist)

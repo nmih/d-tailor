@@ -6,6 +6,9 @@ Created on Nov 11, 2012
 
 from itertools import product
 from collections import OrderedDict
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Design(object):
     """
@@ -78,3 +81,5 @@ class CustomDesign(Design):
 
         self.listDesigns = targets
         self.nDesigns = len(targets)
+
+        logger.debug('Designs/targets: {}'.format(self.listDesigns))

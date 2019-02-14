@@ -190,7 +190,7 @@ class SequenceDesigner(object):
                     want += k + '.'
                     closest_level += solution.levels[new_key] + '.'
 
-                logger.info('SolutionIterator: closest levels ({}): {}'.format(want.strip('.'), closest_level.strip('.')))
+                logger.info('SolutionIterator: starting from level ({}): {}'.format(want.strip('.'), closest_level.strip('.')))
             else:
                 logger.debug("SolutionIterator: Starting from master sequence")
                 parent = master

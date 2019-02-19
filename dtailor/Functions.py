@@ -1140,7 +1140,7 @@ def mutateAll(sequence, keep_aa, mutable_region, cds_region, pos=None, n_mut=[1,
 
 
 def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions, cai_table, direction = '+',
-                      n_mut=[1, 2, 4, 8, 16, 32, 64, 128, 256]):
+                      n_mut=[1, 2, 4, 8, 16, 32, 64, 128]):
     '''
         Operator that given a sequence, mutates the sequence to change CAI
             sequnce: sequence

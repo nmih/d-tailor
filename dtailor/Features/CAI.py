@@ -49,7 +49,7 @@ class CAI(Feature):
             self.scores             = caiObject.scores
 
     def set_scores(self, scoring_function=Functions.analyze_cai):
-        logger.debug('Scoring CAI for sequence: {}'.format(self.sequence))
+        logger.debug('Scoring CAI for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "CAI"] = scoring_function(seq=self.sequence, cai_table=self.cai_table)
 
     def mutate(self, operator=Functions.SimpleCAIOperator):

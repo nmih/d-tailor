@@ -51,7 +51,7 @@ class StructureRNAFold(Feature):
             self.scores             = structureObject.scores
                             
     def set_scores(self, scoring_function=Functions.analyze_structure_rnafold):
-        logger.debug('Scoring RNA structure for sequence: {}'.format(self.sequence))
+        logger.debug('Scoring RNA structure for sequence')#: {}'.format(self.sequence))
         scoring_function(seq=self.sequence, filename=self.structurefile, project_dir=self.solution.project_dir)
                                                                      
     def mutate(self):        

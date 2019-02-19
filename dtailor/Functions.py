@@ -1039,7 +1039,7 @@ def SimplePWMPositionOperator(seq, pwmnt, position=None, mutable_region = None, 
 
 
 def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_table=None, pos=None,
-                           n_mut=[1,2]):
+                           n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30]):
     '''
         Operator that given a sequence, mutates the sequence randomly
             sequnce: sequence
@@ -1064,13 +1064,13 @@ def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_ta
 
 
 def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos=None,
-              n_mut=[1,2]):
+              n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30]):
     # TODO: can u increase n_mut to have more?
     if keep_aa == True:
         result = analyzeCodons(seq=sequence, data_table=cai_table, positions=mutableCodonsPosition)
 
         n_mutations = choice(n_mut)
-        # logger.debug('Making {} mutations'.format(n_mutations))
+        logger.debug('Making {} mutations'.format(n_mutations))
 
         codons = (result[0])
         codons_ind = list(range(0, codons.__len__()))
@@ -1111,7 +1111,7 @@ def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, p
         else:
             return new_seq
 
-def mutateAll(sequence, keep_aa, mutable_region, cds_region, pos=None, n_mut = [1,2]):
+def mutateAll(sequence, keep_aa, mutable_region, cds_region, pos=None, n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30]):
 
     #####
     # Not necessary to keep AA
@@ -1139,7 +1139,8 @@ def mutateAll(sequence, keep_aa, mutable_region, cds_region, pos=None, n_mut = [
     return new_seq
 
 
-def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions, cai_table, direction = '+'):
+def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions, cai_table, direction = '+',
+                      n_mut=[1, 2, 4, 8, 16, 32, 64, 128, 256]):
     '''
         Operator that given a sequence, mutates the sequence to change CAI
             sequnce: sequence
@@ -1157,11 +1158,14 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
 
     result = analyzeCodons(seq=sequence,data_table=cai_table, positions=mutableCodonsPosition)
 
+    n_mutations = choice(n_mut)
+    logger.debug('SimpleCAIOperator: making {} mutations'.format(n_mutations))
+
     codons = (result[0])
     codons_cai = (result[1])
     codons_ind = list(range(0,codons.__len__()))
 
-    while not mutated and codons_ind.__len__() != 0:
+    while codons_ind.__len__() != 0 and n_mutations > 0:
 
         rnd_ind       = codons_ind.pop(randint(0,codons_ind.__len__()-1))
         rnd_codon     = codons[rnd_ind]
@@ -1183,21 +1187,21 @@ def SimpleCAIOperator(sequence, cai_range, keep_aa, mutable_region, cds_regions,
         if alt_codons.__len__() != 0:
             mutated = True
             new_codon = choice(alt_codons)
+            n_mutations -= 1
             #print "new: " + str(new_codon)
+            #print "CAI operator: old_codon -> " + str(rnd_codon)
+            #print "CAI operator: new_codon -> " + str(new_codon)
+            real_codon_pos = mutableCodonsPosition[rnd_ind]
+            codon_position = int((real_codon_pos-cai_range[0])/3)
+            all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cai_range[0],cai_range[1],3))[0]
+            all_codons[codon_position]=new_codon
+            new_seq = sequence[:cai_range[0]] + ''.join(c for c in all_codons) + sequence[cai_range[1]:]
+            sequence = new_seq
 
     if mutated == False:
         sys.stderr.write("SimpleCAIOperator: Not able to mutate sequence\n")
         return None
     else:
-        #print "CAI operator: old_codon -> " + str(rnd_codon)
-        #print "CAI operator: new_codon -> " + str(new_codon)
-        real_codon_pos = mutableCodonsPosition[rnd_ind]
-        codon_position = int((real_codon_pos-cai_range[0])/3)
-        all_codons = analyzeCodons(seq=sequence,data_table=cai_table,positions=range(cai_range[0],cai_range[1],3))[0]
-        all_codons[codon_position]=new_codon
-
-
-        new_seq = sequence[:cai_range[0]] + ''.join(c for c in all_codons) + sequence[cai_range[1]:]
         return new_seq
 
 def hammingDistance(seq1,seq2):

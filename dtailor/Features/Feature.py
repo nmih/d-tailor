@@ -141,7 +141,7 @@ class Feature(object):
         
         return
 
-    def randomMutation(self, pos=None, n_mut=[1, 2, 3], mutable_region=None):
+    def randomMutation(self, pos=None, n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30], mutable_region=None):
         if mutable_region == None:
             if self.mutable_region == None:
                 mutable_region = self.solution.mutable_region

@@ -14,6 +14,10 @@ from subprocess import check_output
 from socket import gethostbyname,gethostname
 from dtailor.Functions import pick_random
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 class DBSQLite(DBAbstract):
     '''
     Constructor
@@ -184,12 +188,12 @@ class DBSQLite(DBAbstract):
         
         self.cur.execute(query,desiredSolution)                        
         all_solutions = (self.cur.fetchall())
-        
+
         #print all_solutions
         distanceArray = [self.distanceBetweenSolutions(sol_i, desiredSolution) for sol_i in all_solutions]
         total_fit = sum([1/(dist+0.0001) for dist in distanceArray])
         p_array = [((1/dist)/total_fit) for dist in distanceArray]
-        
+
         if all_solutions == []:
             return None
         else:

@@ -125,6 +125,12 @@ class Solution:
             #return choice(mutable).randomMutation()
             #return self.randomMutation()
         
-    def randomMutation(self,pos=None, n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30]):
+    def randomMutation(self,pos=None, n_mut=[1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300]):
         new_seq = randomMutationOperator(self.sequence, self.keep_aa, self.mutable_region, self.cds_region, pos,n_mut)     
-        return Solution(sol_id=str(uuid4().int), sequence=new_seq, cds_region = self.cds_region, keep_aa = self.keep_aa, mutable_region = self.mutable_region, parent=self, design=self.designMethod)
+        return Solution(sol_id=str(uuid4().int),
+                        sequence=new_seq,
+                        cds_region=self.cds_region,
+                        keep_aa=self.keep_aa,
+                        mutable_region=self.mutable_region,
+                        parent=self,
+                        design=self.designMethod, project_dir=self.project_dir)

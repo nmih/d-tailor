@@ -141,12 +141,14 @@ class Feature(object):
         
         return
 
-    def randomMutation(self, pos=None, n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30], mutable_region=None):
+    def randomMutation(self, pos=None, n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30, 50, 100, 200], mutable_region=None):
         if mutable_region == None:
             if self.mutable_region == None:
                 mutable_region = self.solution.mutable_region
             else:
                 mutable_region = self.mutable_region
+
+        logger.debug('Mutable region: {}'.format(mutable_region))
 
         new_seq = Functions.randomMutationOperator(self.solution.sequence, self.solution.keep_aa, mutable_region,
                                                    self.solution.cds_region,

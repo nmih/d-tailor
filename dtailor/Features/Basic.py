@@ -208,6 +208,8 @@ class LocalGC(Feature):
             self.keep_aa = featureObject.keep_aa
             self.scores = featureObject.scores
 
+        self.window_start_index = 0
+
     def analyze_local_gc(self):
         """Return a percentage (0 to 100) of the window with the highest local GC%"""
         max_gc = 0
@@ -217,8 +219,12 @@ class LocalGC(Feature):
         for x in range(len(self.sequence)):
             if x <= len(self.sequence) - self.window_size:
                 gc = Bio.SeqUtils.GC(self.sequence[x:x + self.window_size])
+
                 if gc > max_gc:
                     max_gc = gc
+                    self.window_start_index = x
+
+                    # logger.debug('x {} localgcmax {}'.format(x, max_gc))
         return max_gc
 
     def set_scores(self):
@@ -227,5 +233,6 @@ class LocalGC(Feature):
 
     def mutate(self):
         # TODO: smarter mutation would be in the window of non desired GC content
+        # self.analyze_local_gc()
+        # return Feature.randomMutation(self, mutable_region=(self.window_start_index-30, self.window_start_index+self.window_size+30))
         return Feature.randomMutation(self, mutable_region=self.mutable_region)
-

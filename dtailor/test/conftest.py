@@ -23,7 +23,7 @@ _cai_levels = {'3': (0.7244389601788824, 0.7466550646222192),
                '2': (0.6906052493341361, 0.7244389601788824),
                '1': (0, 0.6906052493341361)}
 
-_targets = ['5.5.5', '4.4.4', '3.3.3', '2.2.2', '1.1.1']
+_targets = ['5.5.5.1.1.1.1', '4.4.4.1.1.1.1', '3.3.3.1.1.1.1', '2.2.2.1.1.1.1', '1.1.1.1.1.1.1']
 
 _cai_table = {'aaa': 1.0,
  'aac': 0.610738255033557,
@@ -90,6 +90,11 @@ _cai_table = {'aaa': 1.0,
  'ttg': 1.0,
  'ttt': 1.0}
 
+_levels_longestrepeat = {'1': (0, 19), '0': (19, 999999999)}
+_levels_longesthomopolymer = {'1': (0, 10), '0': (10, 999999999)}
+_levels_globalgc = {'0': (0, 25), '1': (25, 65), '2': (65, 100)}
+_levels_localgc = {'0': (0, 35), '1': (35, 65), '2': (65, 100)}
+
 
 @pytest.fixture(scope='module')
 def pk_mfe_levels():
@@ -115,26 +120,60 @@ def pk_cai_table():
 def test_sequence():
     return 'ATGTCTGCAACTTCCGTCACTTTCCCAATTATCAACGAAACTTACCAACAGCCAACCGGGCTTTTCATCAACAATGAATTTGTTAGTGCAAAGTCAGGTAAGACTTTTGATGTTAACACTCCAATTGATGAGTCTCTCATTTGTAAAGTCCAACAGGCCGATGCTGAAGATGTTGAAATTGCCGTTCAAGCAGCATCTAAAGCTTACAAGACTTGGAGATTTACACCGCCAAATGAAAGAGGCAGATACTTGAACAAATTGGCCGATTTGATGGACGAAAAGAGAGACTTACTTGCCAAAATTGAATCCCTTGATAATGGTAAGGCCTTACATTGTGCAAAATTCGATGTCAATCTTGTCATTGAATATTTCAGATACTGTGCAGGTTACTGTGATAAAATCGATGGTAGAACAATTACAACCGATGTCGAACATTTTACCTACACTAGAAAGGAACCTTTAGGTGTCTGTGGTGCAATTACACCTTGGAACTTCCCATTGCTGATGTTTGCTTGGAAAATCGGCCCGGCTTTAGCAACCGGTAATACCATTATTTTGAAGCCTGCCAGTGCAACACCTCTATCAAACCTCTTTACTTGTACCTTGATCAAGGAGGCGGGCATTCCAGCCGGTGTTGTTAATGTTGTTCCAGGTTCCGGTAGAGGCTGTGGTAACTCCATTTTACAACATCCTAAAATTAAGAAGGTTGCGTTTACCGGATCTACAGAAGTTGGTAAAACTGTTATGAAGGAATGTGCTAATTCCATCAAAAAGGTTACTCTCGAATTGGGTGGTAAGTCTCCAAACATTGTTTTCAAAGACTGTAACGTTGAACAAACCATTCAAAATTTGATTACTGGTATTTTCTTCAATGGTGGTGAAGTCTGTTGTGCTGGTTCTAGAATTTACATTGAAGCAACCGATGAGAAATGGTATACTGAATTCTTGACCAAATTCAAGGAGACTGTTGAAAAATTAAAGATTGGTAACCCATTTGAAGAGGGTGTTTTCCAAGGTGCACAAACCACTCCAGATCAATTCCAAACTGTCTTGGACTACATCACCGCTGCTAACGAATCCAGCTTGAAACTATTAACTGGTGGTAAAAGAATTGGCAATAAGGGATACTTTGTTGAGCCAACTATCTTCTACGATGTTCCTCAAAATTCCAAGTTAACTCAAGAAGAAATCTTTGGTCCAGTTGCTGTTGTTTTACCTTTCAAGTCCACTGAAGAATTGATTGAAAAGGCAAATGATTCCGATTTTGGTTTAGGTTCCGGTATTCACACTGAAGATTTCAACAAGGCAATTTGGGTTTCCGAAAGGCTTGAAGCAGGTTCTGTTTGGATCAACACTTACAATGATTTCCACCCAGCTGCTCCATTCGGTGGTTACAAGGAATCCGGTATTGGCAGAGAAATGGGTATTGAAGCTTTCGACAACTATACTCAAACCAAGTTAGTTAGAGCTAGAGTTAACAAGCCAGCTTTTTAG'
 
+@pytest.fixture(scope='module')
+def levels_longestrepeat():
+    return _levels_longestrepeat
+@pytest.fixture(scope='module')
+def levels_longesthomopolymer():
+    return _levels_longesthomopolymer
+@pytest.fixture(scope='module')
+def levels_globalgc():
+    return _levels_globalgc
+@pytest.fixture(scope='module')
+def levels_localgc():
+    return _levels_localgc
 
 @pytest.fixture(scope='module')
 def design_params(test_sequence):
-    dp = OrderedDict()
-    dp['mfe'] = {
-            'feattype'      : 'StructureRNAFoldMFE',
-            'type'          : 'REAL',
-            'mutable_region': (0, 33),
-            'thresholds'    : _mfe_levels}
-    dp['ramp'] = {
-            'feattype'      : 'CAI',
-            'type'          : 'REAL',
-            'mutable_region': (0, 33),
-            'thresholds'    : _cai_levels}
-    dp['rest'] = {
-            'feattype'      : 'CAI',
-            'type'          : 'REAL',
-            'mutable_region': (33, len(test_sequence)),
-            'thresholds'    : _cai_levels}
-    return dp
+
+    design_params = OrderedDict()
+    design_params["mfe"] = {
+        'feattype'      : 'StructureRNAFoldMFE',
+        'type'          : 'REAL',
+        'mutable_region': (0,33),
+        'thresholds'    : _mfe_levels}
+    design_params["ramp"] = {
+        'feattype'      : 'CAI',
+        'type'          : 'REAL',
+        'mutable_region': (0,33),
+        'thresholds'    : _cai_levels}
+    design_params["rest"] = {
+        'feattype'      : 'CAI',
+        'type'          : 'REAL',
+        'mutable_region': (33, len(test_sequence)),
+        'thresholds'    : _cai_levels}
+    design_params['twist_lrs'] = {
+        'feattype'      : 'LongestRepeatedSubseq',
+        'type'          : 'INTEGER',
+        'mutable_region': (0, len(test_sequence)),
+        'thresholds'    : _levels_longestrepeat}
+    design_params['twist_lh'] = {
+        'feattype'      : 'LongestHomopolymer',
+        'type'          : 'INTEGER',
+        'mutable_region': (0, len(test_sequence)),
+        'thresholds'    : _levels_longesthomopolymer}
+    design_params['twist_ggc'] = {
+        'feattype'      : 'GlobalGC',
+        'type'          : 'REAL',
+        'mutable_region': (0, len(test_sequence)),
+        'thresholds'    : _levels_globalgc}
+    design_params['twist_lgc'] = {
+        'feattype'      : 'LocalGC',
+        'type'          : 'REAL',
+        'mutable_region': (0, len(test_sequence)),
+        'thresholds'    : _levels_localgc}
+
+    return design_params
 
 
 @pytest.fixture(scope='module')

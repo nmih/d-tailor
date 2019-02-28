@@ -47,6 +47,11 @@ class RandomSampling(Design):
 
     def __init__(self, featuresObj, sample_size=1000):
         Design.__init__(self, featuresObj)
+
+        self.thresholds = OrderedDict()
+        for feature in featuresObj.keys():
+            self.thresholds[feature + featuresObj[feature]['feattype']] = featuresObj[feature]['thresholds']
+
         self.listDesigns = []
         self.nDesigns = sample_size
 

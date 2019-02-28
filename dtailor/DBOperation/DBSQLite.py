@@ -278,13 +278,13 @@ class DBSQLite(DBAbstract):
         sql = "update desired_solution set worker_id=:worker_id, status=:status where des_solution_id=:des_solution_id"
         self.cur.executemany(sql , self.des_solutions_sql)
         self.des_solutions_sql[:] = [] #empty list
-        
+
         # generated solutions
         features_fields = ','.join([feature+", "+feature+"Level, "+feature+"Position" for feature in self.new_features_list])
         features_values_fields = ','.join([":"+feature+", :"+feature+"Level, :"+feature+"Position" for feature in self.new_features_list])
                            
         sql = "insert into generated_solution(generated_solution_id, des_solution_id, sequence, "+features_fields+",worker_id) \
-                                    values(:generated_solution_id, :des_solution_id, :sequence, "+features_values_fields+", :worker_id);"                            
+                                    values(:generated_solution_id, :des_solution_id, :sequence, "+features_values_fields+", :worker_id);"
         self.cur.executemany(sql , self.gen_solutions_sql)
         self.gen_solutions_sql[:] = [] #empty list
         

@@ -6,6 +6,7 @@ Created on Dec 22, 2012
 
 import sys
 from dtailor.SequenceDesigner import SequenceDesigner
+from dtailor.Features.Basic import LongestRepeat
 from dtailor.Features.CAI import CAI
 from dtailor.Features.StructureRNAFold import StructureRNAFold, StructureRNAFoldMFE
 from dtailor.Features.RNADuplexRNAFold import RNADuplexRNAFold, RNADuplexRNAFoldRibosome, RNADuplexRNAFoldMFE

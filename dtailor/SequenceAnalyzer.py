@@ -9,7 +9,6 @@ import sys
 from dtailor.Solution import Solution
 from csv import DictReader
 from Bio import SeqIO
-from tqdm import tqdm
 
 
 class SequenceAnalyzer(object):
@@ -85,7 +84,7 @@ class SequenceAnalyzer(object):
         # self.outputStart()
         final_output = {}
         
-        for sequence in tqdm(self.list_of_input_sequences):
+        for sequence in self.list_of_input_sequences:
             sol_id = sequence['name']
             seq = sequence['sequence']
             

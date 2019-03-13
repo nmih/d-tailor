@@ -4,6 +4,7 @@ Created on Nov 1, 2012
 @author: jcg
 '''
 
+from dtailor.Exceptions import DTailorException
 from dtailor.DBOperation.DBSQLite import DBSQLite
 from dtailor.Solution import Solution
 from time import time
@@ -127,7 +128,7 @@ class SequenceDesigner(object):
         logger.info(master.levels)
 
         if not master.valid:
-            raise Exception("Seed inserted is not a valid sequence!")
+            raise DTailorException("Seed inserted is not a valid sequence!")
 
         self.dbconnection.DBInsertSolution(master)
         # self.solutionsHash[master.solid] = master

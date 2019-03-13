@@ -7,6 +7,7 @@ Created on Oct 3, 2011
 import logging
 logger = logging.getLogger(__name__)
 
+from dtailor.Exceptions import DTailorException
 from dtailor.Data import *
 from math import log, exp, sqrt
 from random import randint, choice, random
@@ -31,29 +32,29 @@ def validateCDS(cds="", check_frame=True, check_start=True, check_end_stop=True,
     if check_frame:
         if len(cds) % 3 != 0:
             logger.error('CDS length is not a multiple of 3')
-            logger.debug('ERROR: {}'.format(cds))
+            # logger.debug('ERROR: {}'.format(cds))
             return False
 
     # starts with a start codon (ATG, GTG, TTG)
     if check_start:
         if cds[0:3] not in ('atg', 'gtg', 'ttg'):
             logger.error('Sequence does not start with a start codon')
-            logger.debug('ERROR: {}'.format(cds))
+            # logger.debug('ERROR: {}'.format(cds))
             return False
 
     # stop with a stop codon
     if check_end_stop:
         if cds[-3:] not in ('taa', 'tag', 'tga'):
             logger.error('Sequence does not stop with a stop codon')
-            logger.debug('ERROR: {}'.format(cds))
+            # logger.debug('ERROR: {}'.format(cds))
             return False
 
     # stop codon in the middle
     if check_within_stop:
         if len(set([cds[i:i + 3] for i in range(3, len(cds) - 3, 3)]).intersection(['taa', 'tag', 'tga'])) != 0:
-            logger.error('Stop codon found within sequence')
-            logger.debug('ERROR: {}'.format(cds))
-            return False
+            raise DTailorException('Stop codon found within sequence')
+            # logger.debug('ERROR: {}'.format(cds))
+            # return False
 
     return True
 

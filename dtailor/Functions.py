@@ -53,7 +53,7 @@ def validateCDS(cds="", check_frame=True, check_start=True, check_end_stop=True,
     if check_within_stop:
         if len(set([cds[i:i + 3] for i in range(3, len(cds) - 3, 3)]).intersection(['taa', 'tag', 'tga'])) != 0:
             raise DTailorException('Stop codon found within sequence')
-            # logger.debug('ERROR: {}'.format(cds))
+            # logger.error('Stop codon found within sequence')
             # return False
 
     return True

@@ -74,11 +74,19 @@ class AllAndRampAnalyzer(SequenceAnalyzer):
                 solution.add_feature(cai_ramp_obj)
 
                 # CAI - not ramp only
-                cai_rest_obj = CAI(solution=solution,
-                                   label="rest",
-                                   cai_table=self.cai_table,
-                                   args={'cai_range'     : (self.ramp_from_to[1], len(solution.sequence)),
-                                         'mutable_region': range(self.ramp_from_to[1], len(solution.sequence))})
+                # If sequence is too short just redo the CAI calc
+                if len(solution.sequence) <= self.ramp_from_to[1]:
+                    cai_rest_obj = CAI(solution=solution,
+                                       label="rest",
+                                       cai_table=self.cai_table,
+                                       args={'cai_range'     : (0, self.ramp_from_to[1]),
+                                             'mutable_region': range(0, self.ramp_from_to[1])})
+                else:
+                    cai_rest_obj = CAI(solution=solution,
+                                       label="rest",
+                                       cai_table=self.cai_table,
+                                       args={'cai_range'     : (self.ramp_from_to[1], len(solution.sequence)),
+                                             'mutable_region': range(self.ramp_from_to[1], len(solution.sequence))})
                 solution.add_feature(cai_rest_obj)
 
                 # MFE - ramp only

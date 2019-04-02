@@ -1,9 +1,8 @@
 before_script:
   - apt-get update -q -y
-  - apt-get install -y wget
+  - apt-get install -y gdebi-core wget
   - wget https://www.tbi.univie.ac.at/RNA/download/ubuntu/ubuntu_18_04/viennarna_2.4.11-2_amd64.deb
-  - mv viennarna_2.4.11-2_amd64.deb /var/cache/apt/archives/
-  - apt-get install -y viennarna
+  - gdebi viennarna_2.4.11-2_amd64.deb
   - apt-get install -y python3-dev python3-pip git
   - pip3 install pytest
   - git config --global http.sslverify "false"

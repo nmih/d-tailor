@@ -321,7 +321,6 @@ class DBSQLite(DBAbstract):
             t_max = thresholds[1]
             t_min = thresholds[0]
             
-            #TODO how to see how far a solution is when limits are infinity?
             if t_max==None:
                 return 0
             elif t_min==None:

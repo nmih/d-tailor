@@ -1,5 +1,6 @@
 before_script:
   - apt-get update -q -y
+  - apt-get install wget
   - wget https://www.tbi.univie.ac.at/RNA/download/ubuntu/ubuntu_18_04/viennarna_2.4.11-2_amd64.deb
   - dpkg -i viennarna_2.4.11-2_amd64.deb
   - apt-get install -f

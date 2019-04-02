@@ -2,11 +2,12 @@ from dtailor.Features.Feature import Feature
 from dtailor import Functions, Solution
 from uuid import uuid4
 import Bio.SeqUtils
+import difflib
 import logging
 logger = logging.getLogger(__name__)
 
 
-class LongestRepeatedSubseq(Feature):
+class LongestRepeatedSubstr(Feature):
     """Basic boolean check for if there are subsequences that """
 
     def __init__(self, featureObject=None, solution=None, label="", args={'feature_range' : (0, 59),
@@ -33,8 +34,8 @@ class LongestRepeatedSubseq(Feature):
             self.keep_aa = featureObject.keep_aa
             self.scores = featureObject.scores
 
-    def analyze_longest_repeated_subsequence(self):
-        """https://www.geeksforgeeks.org/longest-repeated-subsequence/"""
+    def analyze_longest_repeated_substring(self):
+        """https://www.geeksforgeeks.org/longest-repeating-and-non-overlapping-substring/"""
 
         n = len(self.sequence)
         LCSRe = [[0 for x in range(n + 1)]
@@ -71,12 +72,17 @@ class LongestRepeatedSubseq(Feature):
                                         index + 1):
                 res = res + self.sequence[i - 1]
 
+        # Set mutable region to this repeated substring
+        mutstart = self.sequence.index(res)
+        self.mutable_region = range(mutstart, mutstart + len(res))
+        logger.debug('Repeated substring at index {} of len {}'.format(mutstart, len(res)))
+
         return len(res)
 
     def set_scores(self):
-        # TODO: definitely the slowest link, optimize this with a rolling hash table?
-        logger.debug('Scoring longest repeated sequences for sequence')#: {}'.format(self.sequence))
-        self.scores[self.label + "LongestRepeatedSubseq"] = self.analyze_longest_repeated_subsequence()
+        # TODO: #later: This part takes the longest to score (not that long really) and can be sped up with a suffix tree or suffix array
+        logger.debug('Scoring longest repeated sequences for sequence: {}'.format(self.sequence))
+        self.scores[self.label + "LongestRepeatedSubstr"] = self.analyze_longest_repeated_substring()
 
     def mutate(self):
         return Feature.randomMutation(self, mutable_region=self.mutable_region)
@@ -224,7 +230,9 @@ class LocalGC(Feature):
                     max_gc = gc
                     self.window_start_index = x
 
-                    # logger.debug('x {} localgcmax {}'.format(x, max_gc))
+        # Change the mutable region to be in this window of high GC%
+        self.mutable_region = range(self.window_start_index, self.window_start_index+self.window_size)
+        logger.debug('Local GC content of percentage {} at index {} to {}'.format(max_gc, self.window_start_index, self.window_start_index+self.window_size))
         return max_gc
 
     def set_scores(self):
@@ -232,7 +240,4 @@ class LocalGC(Feature):
         self.scores[self.label + "LocalGC"] = self.analyze_local_gc()
 
     def mutate(self):
-        # TODO: smarter mutation would be in the window of non desired GC content
-        # self.analyze_local_gc()
-        # return Feature.randomMutation(self, mutable_region=(self.window_start_index-30, self.window_start_index+self.window_size+30))
         return Feature.randomMutation(self, mutable_region=self.mutable_region)

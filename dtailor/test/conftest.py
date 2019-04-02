@@ -153,7 +153,7 @@ def design_params(test_sequence):
         'mutable_region': (33, len(test_sequence)),
         'thresholds'    : _cai_levels}
     design_params['twist_lrs'] = {
-        'feattype'      : 'LongestRepeatedSubseq',
+        'feattype'      : 'LongestRepeatedSubstr',
         'type'          : 'INTEGER',
         'mutable_region': (0, len(test_sequence)),
         'thresholds'    : _levels_longestrepeat}

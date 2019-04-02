@@ -24,4 +24,4 @@ def test_custom_design_init(design_params, targets):
     assert des.listDesigns == targets
     assert des.nDesigns == len(targets)
     assert [k for k in des.thresholds] == ['mfeStructureRNAFoldMFE', 'rampCAI', 'restCAI',
-                                           'twist_lrsLongestRepeatedSubseq', 'twist_lhLongestHomopolymer', 'twist_ggcGlobalGC', 'twist_lgcLocalGC']
+                                           'twist_lrsLongestRepeatedSubstr', 'twist_lhLongestHomopolymer', 'twist_ggcGlobalGC', 'twist_lgcLocalGC']

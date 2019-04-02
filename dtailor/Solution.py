@@ -125,8 +125,11 @@ class Solution:
             #return choice(mutable).randomMutation()
             #return self.randomMutation()
         
-    def randomMutation(self,pos=None, n_mut=[1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300]):
-        new_seq = randomMutationOperator(self.sequence, self.keep_aa, self.mutable_region, self.cds_region, pos,n_mut)     
+    def randomMutation(self,pos=None, n_mut=[20, 40, 80, 160, 240, 320, 400, 500, 600, 1000, 2000]):
+        # n_mut is set to really high numbers so many mutations are made in the "neutral" setting (which is the only
+        # time this function is used)
+        # TODO: #later: make n_mut alterable from higher-level functions
+        new_seq = randomMutationOperator(self.sequence, self.keep_aa, self.mutable_region, self.cds_region, pos,n_mut)
         return Solution(sol_id=str(uuid4().int),
                         sequence=new_seq,
                         cds_region=self.cds_region,

@@ -274,7 +274,7 @@ class SequenceDesigner(object):
                     # Stops when number generated solutions is equal to the desired sample size
                     if sol_counter >= self.designMethod.nDesigns:
                         all_combinations_found = True
-                        print("RandomSampling: %s solutions generated." % (sol_counter))
+                        logger.debug("RandomSampling: %s solutions generated." % (sol_counter))
 
                         # insert solution in the DB
             if solution != None and solution.checkSolution(desired_solution) and solution != parent and solution.valid:
@@ -293,15 +293,15 @@ class SequenceDesigner(object):
         self.dbconnection.DBCloseConnection()
 
         if len(self.designMethod.listDesigns) == 1:
-            print("\n###########################")
-            print("# Optimized solution:")
-            print("# ID: {}".format(solution.solid))
-            print("# Sequence: {}".format(solution.sequence))
-            print("# Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
-            print("# Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
-            print("# Number of generated solutions: {}".format(sol_counter))
-            print("# Distance to seed: {}".format(hammingDistance(master.sequence, solution.sequence)))
-            print("###########################\n")
+            logger.info("\n###########################")
+            logger.info("# Optimized solution:")
+            logger.info("# ID: {}".format(solution.solid))
+            logger.info("# Sequence: {}".format(solution.sequence))
+            logger.info("# Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
+            logger.info("# Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
+            logger.info("# Number of generated solutions: {}".format(sol_counter))
+            logger.info("# Distance to seed: {}".format(hammingDistance(master.sequence, solution.sequence)))
+            logger.info("###########################\n")
 
         logger.info("Program finished, all combinations were found!")
         logger.info(

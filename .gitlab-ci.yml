@@ -3,6 +3,9 @@ before_script:
   - apt-get install -y gdebi-core wget
   - wget https://www.tbi.univie.ac.at/RNA/download/ubuntu/ubuntu_18_04/viennarna_2.4.11-2_amd64.deb
   - gdebi --non-interactive viennarna_2.4.11-2_amd64.deb
+  - wget https://zlab.bu.edu/~mfrith/downloads/repfind
+  - chmod +x repfind
+  - mv repfind /usr/local/bin/
   - apt-get install -y python3-dev python3-pip git
   - pip3 install pytest
   - git config --global http.sslverify "false"

@@ -2,7 +2,12 @@ from dtailor.Features.Feature import Feature
 from dtailor import Functions, Solution
 from uuid import uuid4
 import Bio.SeqUtils
-import difflib
+import random
+import subprocess
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import IUPAC
 import logging
 logger = logging.getLogger(__name__)
 
@@ -241,3 +246,90 @@ class LocalGC(Feature):
 
     def mutate(self):
         return Feature.randomMutation(self, mutable_region=self.mutable_region)
+
+
+class SmallRepeatPercentage(Feature):
+    """Basic boolean check for if there are subsequences that """
+
+    def __init__(self, featureObject=None,
+                 solution=None,
+                 label="",
+                 args={'feature_range' : (0, 59),
+                       'mutable_region': None,
+                       'cds_region'    : None,
+                       'keep_aa'       : True}):
+        if featureObject == None:  # create new instance
+            # General properties of feature
+            Feature.__init__(self, solution=solution, label=label)
+            # Specifics of this Feature
+            self.feature_range = args['feature_range']
+            self.sequence = solution.sequence[self.feature_range[0]:self.feature_range[1]]
+            self.mutable_region = args['mutable_region'] if 'mutable_region' in args else solution.mutable_region
+            self.cds_region = args['cds_region'] if 'cds_region' in args else solution.cds_region
+            self.keep_aa = args['keep_aa'] if 'keep_aa' in args else solution.keep_aa
+            self.set_scores()
+            self.set_level()
+        else:  # copy instance
+            Feature.__init__(self, featureObject)
+            self.feature_range = featureObject.feature_range
+            self.sequence = featureObject.sequence
+            self.mutable_region = featureObject.mutable_region
+            self.cds_region = featureObject.cds_region
+            self.keep_aa = featureObject.keep_aa
+            self.scores = featureObject.scores
+
+    def write_tmp_fasta_file(self, outfile='/tmp/repfind.fasta', alphabet=IUPAC.IUPACUnambiguousDNA):
+        """Write a temporary FASTA file"""
+        sr = SeqRecord(Seq(self.sequence, alphabet), id="tmp_id", name="tmp_name", description="tmp_desc", dbxrefs=None,
+                       features=None, annotations=None, letter_annotations=None)
+        SeqIO.write(sr, outfile, "fasta")
+        return outfile
+
+    def run_repfind(self, in_fasta, min_repeat_len=8, max_repeat_len=20):
+        """Run the REPFIND program and load results into memory"""
+        executed = subprocess.run(
+                ['repfind', '-s {}'.format(min_repeat_len), '-l {}'.format(max_repeat_len), '-f', in_fasta],
+                stdout=subprocess.PIPE)
+        if executed.returncode != 0:
+            raise Exception('Error code {}'.format(executed.returncode))
+        result = executed.stdout.decode('utf-8')
+        result = result.splitlines()[14:]
+
+        pattern_to_locations = {}
+
+        for x in range(0, len(result), 4):
+            pattern = result[x].replace('Word: ', '')
+            locations = [int(y) for y in result[x + 1].replace('Locations: ', '').replace('|', '').split()]
+            pattern_to_locations[pattern] = locations
+
+        return pattern_to_locations
+
+    def get_repeat_percent_composition(self, repeat_dict):
+        """Get the percentage of the sequence composed of small repeats.
+        NOTE: this will actually overestimate the repeats as it doesn't care about overlaps - however that's ok for
+        current purposes"""
+        total_num_repeated_bases = 0
+        for pat, locs in repeat_dict.items():
+            pat_total_len = len(pat) * len(locs)
+            total_num_repeated_bases += pat_total_len
+
+        # Randomly select one of these repeats to target for mutagenesis
+        random_key = random.choice(list(repeat_dict.keys()))
+        if len(repeat_dict[random_key]) != 0:
+            random_loc = random.choice(repeat_dict[random_key])
+            self.mutable_region = range(random_loc, random_loc + len(random_key))
+
+        return (total_num_repeated_bases / len(self.sequence))*100
+
+    def set_scores(self):
+        """Write the FASTA, run REPFIND, and get the percentage"""
+        logger.debug('Scoring percentage of small repeats for sequence')  #: {}'.format(self.sequence))
+        tmp_fasta = self.write_tmp_fasta_file()
+        result = self.run_repfind(tmp_fasta)
+        percent = self.get_repeat_percent_composition(result)
+        self.scores[self.label + "SmallRepeatPercentage"] = percent
+
+    def mutate(self):
+        return Feature.randomMutation(self, mutable_region=self.mutable_region)
+
+

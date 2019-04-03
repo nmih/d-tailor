@@ -1,7 +1,7 @@
 import sys
 import os.path as op
 from dtailor.SequenceDesigner import SequenceDesigner
-from dtailor.Features.Basic import LongestRepeatedSubstr, LongestHomopolymer, GlobalGC, LocalGC
+from dtailor.Features.Basic import LongestRepeatedSubstr, LongestHomopolymer, GlobalGC, LocalGC, SmallRepeatPercentage
 from dtailor.Features.CAI import CAI
 from dtailor.Features.StructureRNAFold import StructureRNAFold, StructureRNAFoldMFE
 from dtailor.Functions import validateCDS
@@ -110,6 +110,14 @@ class GenericDesigner(SequenceDesigner):
                                                       params['mutable_region'][1])})
             elif params['feattype'] == 'LocalGC':
                 a_feature = LocalGC(
+                        solution=solution,
+                        label=feat,
+                        args={'feature_range' : (params['mutable_region'][0],
+                                                 params['mutable_region'][1]),
+                              'mutable_region': range(params['mutable_region'][0],
+                                                      params['mutable_region'][1])})
+            elif params['feattype'] == 'SmallRepeatPercentage':
+                a_feature = SmallRepeatPercentage(
                         solution=solution,
                         label=feat,
                         args={'feature_range' : (params['mutable_region'][0],

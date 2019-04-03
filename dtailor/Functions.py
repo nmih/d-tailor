@@ -1040,7 +1040,7 @@ def SimplePWMPositionOperator(seq, pwmnt, position=None, mutable_region = None, 
 
 
 def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_table=None, pos=None,
-                           n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30]):
+                           n_mut=None):
     '''
         Operator that given a sequence, mutates the sequence randomly
             sequnce: sequence
@@ -1051,24 +1051,34 @@ def randomMutationOperator(sequence, keep_aa, mutable_region, cds_region, cai_ta
                              set([c, c + 1, c + 2]).issubset(mutable_region)]
     mutableUTRPosition = list(set(mutable_region) - set(range(cds_region[0], cds_region[1])))
 
+    if not n_mut:
+        n_mut = (1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30)
+
     if mutableCodonsPosition == [] and mutableUTRPosition == []:
         sys.stderr.write("randomMutationOperator: No codons available for mutation\n")
         return None
     else:
         if keep_aa == True:
             if (mutableUTRPosition == []) or (mutableCodonsPosition != [] and choice([True, False])):
+                logger.debug('Mutating using Functions.mutateCDS')
+                logger.debug('n_mut {}'.format(n_mut))
                 return mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos, n_mut)
             else:
+                logger.debug('Mutating using Functions.mutateAll')
+                logger.debug('n_mut {}'.format(n_mut))
                 return mutateAll(sequence, keep_aa, mutableUTRPosition, cds_region, pos, n_mut)
         else:
             return mutateAll(sequence, keep_aa, mutable_region, cds_region, pos, n_mut)
 
 
 def mutateCDS(sequence, keep_aa, mutableCodonsPosition, cds_region, cai_table, pos=None,
-              n_mut=[1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30]):
+              n_mut=None):
     # TODO: can u increase n_mut to have more?
     if keep_aa == True:
         result = analyzeCodons(seq=sequence, data_table=cai_table, positions=mutableCodonsPosition)
+
+        if not n_mut:
+            n_mut = (1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 6, 20, 30)
 
         n_mutations = choice(n_mut)
         logger.debug('Making {} mutations'.format(n_mutations))

@@ -88,7 +88,7 @@ class LongestRepeatedSubstr(Feature):
 
     def set_scores(self):
         # TODO: #later: This part takes the longest to score (not that long really) and can be sped up with a suffix tree or suffix array
-        logger.debug('Scoring longest repeated sequences for sequence: {}'.format(self.sequence))
+        logger.debug('Scoring longest repeated sequences for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "LongestRepeatedSubstr"] = self.analyze_longest_repeated_substring()
 
     def mutate(self):

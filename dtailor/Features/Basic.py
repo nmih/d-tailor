@@ -8,6 +8,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
+from codonopt_cli.utils import revcomp_dna
 import os
 import logging
 logger = logging.getLogger(__name__)
@@ -281,7 +282,8 @@ class SmallRepeatPercentage(Feature):
 
     def write_tmp_fasta_file(self, alphabet=IUPAC.IUPACUnambiguousDNA):
         """Write a temporary FASTA file"""
-        sr = SeqRecord(Seq(self.sequence, alphabet), id="tmp_id", name="tmp_name", description="tmp_desc", dbxrefs=None,
+        # Including the reverse complement as Twist takes that into account when synthesizing
+        sr = SeqRecord(Seq(self.sequence.upper() + revcomp_dna(self.sequence.upper()), alphabet), id="tmp_id", name="tmp_name", description="tmp_desc", dbxrefs=None,
                        features=None, annotations=None, letter_annotations=None)
         outfile = 'tmp_repfind.fasta'  # TODO: write this to a better place...
         SeqIO.write(sr, outfile, "fasta")
@@ -318,11 +320,12 @@ class SmallRepeatPercentage(Feature):
         # Randomly select one of these repeats to target for mutagenesis
         if len(list(repeat_dict.keys())) != 0:
             random_key = random.choice(list(repeat_dict.keys()))
-            if len(repeat_dict[random_key]) != 0:
-                random_loc = random.choice(repeat_dict[random_key])
+            filtered = [x for x in repeat_dict[random_key] if x + len(random_key) < len(self.sequence)]
+            if len(filtered) != 0:
+                random_loc = random.choice(filtered)
                 self.mutable_region = range(random_loc, random_loc + len(random_key))
 
-        return (total_num_repeated_bases / len(self.sequence))*100
+        return (total_num_repeated_bases / (len(self.sequence)*2) )*100
 
     def set_scores(self):
         """Write the FASTA, run REPFIND, and get the percentage"""

@@ -283,7 +283,7 @@ class SmallRepeatPercentage(Feature):
         """Write a temporary FASTA file"""
         sr = SeqRecord(Seq(self.sequence, alphabet), id="tmp_id", name="tmp_name", description="tmp_desc", dbxrefs=None,
                        features=None, annotations=None, letter_annotations=None)
-        outfile = 'tmp_repfind.fasta'
+        outfile = 'tmp_repfind.fasta'  # TODO: write this to a better place...
         SeqIO.write(sr, outfile, "fasta")
         return outfile
 
@@ -303,8 +303,6 @@ class SmallRepeatPercentage(Feature):
             pattern = result[x].replace('Word: ', '')
             locations = [int(y) for y in result[x + 1].replace('Locations: ', '').replace('|', '').split()]
             pattern_to_locations[pattern] = locations
-
-        os.remove(in_fasta)
 
         return pattern_to_locations
 

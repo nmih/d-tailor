@@ -8,6 +8,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
+import os
 import logging
 logger = logging.getLogger(__name__)
 
@@ -278,10 +279,11 @@ class SmallRepeatPercentage(Feature):
             self.keep_aa = featureObject.keep_aa
             self.scores = featureObject.scores
 
-    def write_tmp_fasta_file(self, outfile='/tmp/repfind.fasta', alphabet=IUPAC.IUPACUnambiguousDNA):
+    def write_tmp_fasta_file(self, alphabet=IUPAC.IUPACUnambiguousDNA):
         """Write a temporary FASTA file"""
         sr = SeqRecord(Seq(self.sequence, alphabet), id="tmp_id", name="tmp_name", description="tmp_desc", dbxrefs=None,
                        features=None, annotations=None, letter_annotations=None)
+        outfile = 'tmp_repfind.fasta'
         SeqIO.write(sr, outfile, "fasta")
         return outfile
 
@@ -301,6 +303,8 @@ class SmallRepeatPercentage(Feature):
             pattern = result[x].replace('Word: ', '')
             locations = [int(y) for y in result[x + 1].replace('Locations: ', '').replace('|', '').split()]
             pattern_to_locations[pattern] = locations
+
+        os.remove(in_fasta)
 
         return pattern_to_locations
 

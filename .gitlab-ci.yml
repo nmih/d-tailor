@@ -9,9 +9,9 @@ before_script:
   - apt-get install -y python3-dev python3-pip git
   - pip3 install pytest
   - git config --global http.sslverify "false"
+  - pip3 install -e .
   - pip3 install -e git+http://gitlab+deploy-token-3:MDutZfG1zVy3bs2SPAVZ@git.lygos.com/design/codonopt_cli.git#egg=codonopt_cli
   - pip3 install -r requirements.txt
-  - pip3 install -e .
 
 test:
   script:

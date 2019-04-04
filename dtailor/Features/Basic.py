@@ -9,8 +9,9 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
 from codonopt_cli.utils import revcomp_dna
-import os
+import os.path as op
 import uuid
+import tempfile
 import logging
 logger = logging.getLogger(__name__)
 
@@ -286,7 +287,7 @@ class SmallRepeatPercentage(Feature):
         # Including the reverse complement as Twist takes that into account when synthesizing
         sr = SeqRecord(Seq(self.sequence.upper() + revcomp_dna(self.sequence.upper()), alphabet), id="tmp_id", name="tmp_name", description="tmp_desc", dbxrefs=None,
                        features=None, annotations=None, letter_annotations=None)
-        outfile = '{}_repfind.fasta'.format(str(uuid.uuid4()))  # TODO: write this to a better place...
+        outfile = op.join(tempfile.mkdtemp(), '{}_repfind.fasta'.format(str(uuid.uuid4())))
         SeqIO.write(sr, outfile, "fasta")
         return outfile
 

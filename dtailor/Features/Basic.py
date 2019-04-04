@@ -316,10 +316,11 @@ class SmallRepeatPercentage(Feature):
             total_num_repeated_bases += pat_total_len
 
         # Randomly select one of these repeats to target for mutagenesis
-        random_key = random.choice(list(repeat_dict.keys()))
-        if len(repeat_dict[random_key]) != 0:
-            random_loc = random.choice(repeat_dict[random_key])
-            self.mutable_region = range(random_loc, random_loc + len(random_key))
+        if len(list(repeat_dict.keys())) != 0:
+            random_key = random.choice(list(repeat_dict.keys()))
+            if len(repeat_dict[random_key]) != 0:
+                random_loc = random.choice(repeat_dict[random_key])
+                self.mutable_region = range(random_loc, random_loc + len(random_key))
 
         return (total_num_repeated_bases / len(self.sequence))*100
 

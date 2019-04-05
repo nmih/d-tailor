@@ -293,18 +293,18 @@ class SequenceDesigner(object):
         self.dbconnection.DBCloseConnection()
 
         if len(self.designMethod.listDesigns) == 1:
-            logger.info("\n###########################")
-            logger.info("# Optimized solution:")
-            logger.info("# ID: {}".format(solution.solid))
-            logger.info("# Sequence: {}".format(solution.sequence))
-            logger.info("# Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
-            logger.info("# Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
-            logger.info("# Number of generated solutions: {}".format(sol_counter))
-            logger.info("# Distance to seed: {}".format(hammingDistance(master.sequence, solution.sequence)))
-            logger.info("###########################\n")
+            logger.debug("\n###########################")
+            logger.info("Optimized solution found:")
+            logger.debug("# ID: {}".format(solution.solid))
+            logger.debug("# Sequence: {}".format(solution.sequence))
+            logger.info("Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
+            logger.info("Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
+            logger.debug("# Number of generated solutions: {}".format(sol_counter))
+            logger.debug("# Distance to seed: {}".format(hammingDistance(master.sequence, solution.sequence)))
+            logger.debug("###########################\n")
 
-        logger.info("Program finished, all combinations were found!")
-        logger.info(
+        logger.debug("Program finished, all combinations were found!")
+        logger.debug(
             "Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
                 (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
                 sol_counter / (time() - start_time)))

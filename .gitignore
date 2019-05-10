@@ -100,3 +100,4 @@ docs/_build_html/
 
 testFiles/outputFiles/*
 testFiles/outputFiles/
+/example/out/

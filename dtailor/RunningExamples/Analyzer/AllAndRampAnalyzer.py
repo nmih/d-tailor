@@ -3,6 +3,7 @@ from dtailor.SequenceAnalyzer import SequenceAnalyzer
 from dtailor.Features.CAI import CAI
 from dtailor.Features.StructureRNAFold import StructureRNAFold, StructureRNAFoldMFE
 from dtailor.Functions import validateCDS
+from dtailor.Exceptions import DTailorException
 import logging
 logger = logging.getLogger(__name__)
 
@@ -50,9 +51,13 @@ class AllAndRampAnalyzer(SequenceAnalyzer):
 
     def configureSolution(self, solution):
 
-        solution.valid = validateCDS(solution.sequence,
-                                     check_frame=self.check_frame, check_start=self.check_start,
-                                     check_end_stop=self.check_end_stop, check_within_stop=self.check_within_stop)
+        try:
+            solution.valid = validateCDS(solution.sequence,
+                                         check_frame=self.check_frame, check_start=self.check_start,
+                                         check_end_stop=self.check_end_stop, check_within_stop=self.check_within_stop)
+        except DTailorException:
+            logger.error('Solution invalid')
+            solution.valid = False
 
         if solution.valid:
 

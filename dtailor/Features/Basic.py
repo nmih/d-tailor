@@ -7,13 +7,17 @@ import subprocess
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC
-from codonopt_cli.utils import revcomp_dna
+from Bio.Alphabet import IUPAC, generic_dna
 import os.path as op
 import uuid
 import tempfile
 import logging
 logger = logging.getLogger(__name__)
+
+
+def revcomp_dna(in_seq):
+    dna = Seq(in_seq, generic_dna)
+    return str(dna.reverse_complement())
 
 
 class LongestRepeatedSubstr(Feature):

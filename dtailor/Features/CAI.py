@@ -30,7 +30,7 @@ class CAI(Feature):
             Feature.__init__(self, solution=solution, label=label)
             #Specifics of this Feature
             self.cai_range          = args['cai_range']
-            logger.debug('CAI range set to: {}:{}'.format(self.cai_range[0], self.cai_range[1]))
+            # logger.debug('CAI range set to: {}:{}'.format(self.cai_range[0], self.cai_range[1]))
             self.sequence           = solution.sequence[self.cai_range[0]:self.cai_range[1]]
             self.mutable_region     = args['mutable_region'] if 'mutable_region' in args else solution.mutable_region
             self.cds_region         = args['cds_region']    if 'cds_region' in args else solution.cds_region
@@ -49,7 +49,7 @@ class CAI(Feature):
             self.scores             = caiObject.scores
 
     def set_scores(self, scoring_function=Functions.analyze_cai):
-        logger.debug('Scoring CAI for sequence')#: {}'.format(self.sequence))
+        # logger.debug('Scoring CAI for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "CAI"] = scoring_function(seq=self.sequence, cai_table=self.cai_table)
 
     def mutate(self, operator=Functions.SimpleCAIOperator):

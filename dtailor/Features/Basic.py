@@ -88,13 +88,13 @@ class LongestRepeatedSubstr(Feature):
         # Set mutable region to this repeated substring
         mutstart = self.sequence.index(res)
         self.mutable_region = range(mutstart, mutstart + len(res))
-        logger.debug('Repeated substring at index {} of len {}'.format(mutstart, len(res)))
+        # logger.debug('Repeated substring at index {} of len {}'.format(mutstart, len(res)))
 
         return len(res)
 
     def set_scores(self):
         # TODO: #later: This part takes the longest to score (not that long really) and can be sped up with a suffix tree or suffix array
-        logger.debug('Scoring longest repeated sequences for sequence')#: {}'.format(self.sequence))
+        # logger.debug('Scoring longest repeated sequences for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "LongestRepeatedSubstr"] = self.analyze_longest_repeated_substring()
 
     def mutate(self):
@@ -149,7 +149,7 @@ class LongestHomopolymer(Feature):
         return longest
 
     def set_scores(self):
-        logger.debug('Scoring longest homopolymer for sequence')#: {}'.format(self.sequence))
+        # logger.debug('Scoring longest homopolymer for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "LongestHomopolymer"] = self.analyze_longest_homopolymer()
 
     def mutate(self):
@@ -188,7 +188,7 @@ class GlobalGC(Feature):
         return Bio.SeqUtils.GC(self.sequence)
 
     def set_scores(self):
-        logger.debug('Scoring global GC content for sequence')#: {}'.format(self.sequence))
+        # logger.debug('Scoring global GC content for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "GlobalGC"] = self.analyze_global_gc()
 
     def mutate(self):
@@ -245,11 +245,11 @@ class LocalGC(Feature):
 
         # Change the mutable region to be in this window of high GC%
         self.mutable_region = range(self.window_start_index, self.window_start_index+self.window_size)
-        logger.debug('Local GC content of percentage {} at index {} to {}'.format(max_gc, self.window_start_index, self.window_start_index+self.window_size))
+        # logger.debug('Local GC content of percentage {} at index {} to {}'.format(max_gc, self.window_start_index, self.window_start_index+self.window_size))
         return max_gc
 
     def set_scores(self):
-        logger.debug('Scoring local GC content for sequence')#: {}'.format(self.sequence))
+        # logger.debug('Scoring local GC content for sequence')#: {}'.format(self.sequence))
         self.scores[self.label + "LocalGC"] = self.analyze_local_gc()
 
     def mutate(self):
@@ -335,7 +335,7 @@ class SmallRepeatPercentage(Feature):
 
     def set_scores(self):
         """Write the FASTA, run REPFIND, and get the percentage"""
-        logger.debug('Scoring percentage of small repeats for sequence')  #: {}'.format(self.sequence))
+        # logger.debug('Scoring percentage of small repeats for sequence')  #: {}'.format(self.sequence))
         tmp_fasta = self.write_tmp_fasta_file()
         result = self.run_repfind(tmp_fasta)
         percent = self.get_repeat_percent_composition(result)

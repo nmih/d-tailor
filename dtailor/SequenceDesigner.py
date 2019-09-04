@@ -123,9 +123,9 @@ class SequenceDesigner(object):
         self.validateSolution(master)
         solution = master
 
-        logger.info('Starting scores:')
-        logger.info(master.scores)
-        logger.info(master.levels)
+        # logger.debug('Starting scores:')
+        # logger.debug(master.scores)
+        # logger.debug(master.levels)
 
         if not master.valid:
             raise DTailorException("Seed inserted is not a valid sequence!")
@@ -139,9 +139,9 @@ class SequenceDesigner(object):
             iteration = 0
 
             if time() - last_timepoint >= 60:  # Print statistics every 1 minute
-                logger.info("Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
-                (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
-                sol_counter / (time() - start_time)))
+                # logger.debug("Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
+                # (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
+                # sol_counter / (time() - start_time)))
                 last_counter = sol_counter
                 last_timepoint = time()
 
@@ -155,7 +155,7 @@ class SequenceDesigner(object):
                     break
             else:
                 initial_dist = self.distanceBetweenSolutions(master, desired_solution)
-                logger.info("Looking for combination: {}".format(desired_solution['des_solution_id']))
+                # logger.debug("Looking for combination: {}".format(desired_solution['des_solution_id']))
                 desired_solution_id = desired_solution['des_solution_id']
 
             """
@@ -170,7 +170,7 @@ class SequenceDesigner(object):
                 closestSolution = self.dbconnection.DBGetClosestSolution(None)
 
             if closestSolution != None:
-                logger.debug("SolutionIterator: Found close sequence, starting from here...")
+                # logger.debug("SolutionIterator: Found close sequence, starting from here...")
                 # if closestSolution['generated_solution_id'] in self.solutionsHash:
                 #     parent = self.solutionsHash[closestSolution['generated_solution_id']]
                 # else:
@@ -191,9 +191,9 @@ class SequenceDesigner(object):
                     want += k + '.'
                     closest_level += solution.levels[new_key] + '.'
 
-                logger.info('SolutionIterator: starting from level ({}): {}'.format(want.strip('.'), closest_level.strip('.')))
+                # logger.debug('SolutionIterator: starting from level ({}): {}'.format(want.strip('.'), closest_level.strip('.')))
             else:
-                logger.debug("SolutionIterator: Starting from master sequence")
+                # logger.debug("SolutionIterator: Starting from master sequence")
                 parent = master
                 solution = parent
 
@@ -274,11 +274,11 @@ class SequenceDesigner(object):
                     # Stops when number generated solutions is equal to the desired sample size
                     if sol_counter >= self.designMethod.nDesigns:
                         all_combinations_found = True
-                        logger.debug("RandomSampling: %s solutions generated." % (sol_counter))
+                        # logger.debug("RandomSampling: %s solutions generated." % (sol_counter))
 
                         # insert solution in the DB
             if solution != None and solution.checkSolution(desired_solution) and solution != parent and solution.valid:
-                logger.info("Solution found for {}, inserting into DB".format(desired_solution['des_solution_id']))
+                # logger.debug("Solution found for {}, inserting into DB".format(desired_solution['des_solution_id']))
                 self.dbconnection.DBInsertSolution(solution, desired_solution_id)
                 # self.solutionsHash[solution.solid] = solution
                 sol_counter += 1
@@ -286,27 +286,27 @@ class SequenceDesigner(object):
                 logger.debug("Solution already found by other worker")
             else:
                 if self.designMethod.listDesigns != [] and not all_combinations_found:
-                    logger.info("No solution could be found for {}".format(desired_solution['des_solution_id']))
+                    # logger.debug("No solution could be found for {}".format(desired_solution['des_solution_id']))
                     self.dbconnection.DBChangeStatusDesiredSolution(desired_solution_id, 'WAITING')
 
         # set worker as finished
         self.dbconnection.DBCloseConnection()
 
         if len(self.designMethod.listDesigns) == 1:
-            logger.debug("\n###########################")
-            logger.info("Optimized solution found:")
+            logger.debug("###########################")
+            logger.debug("Optimized solution found:")
             logger.debug("# ID: {}".format(solution.solid))
             logger.debug("# Sequence: {}".format(solution.sequence))
-            logger.info("Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
-            logger.info("Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
+            logger.debug("Scores: {}".format([feat + ": " + str(solution.scores[feat]) for feat in self.new_features_list]))
+            logger.debug("Levels: {}".format([feat + "Level: " + str(solution.levels[feat + "Level"]) for feat in self.new_features_list]))
             logger.debug("# Number of generated solutions: {}".format(sol_counter))
             logger.debug("# Distance to seed: {}".format(hammingDistance(master.sequence, solution.sequence)))
-            logger.debug("###########################\n")
+            logger.debug("###########################")
 
-        logger.debug("Program finished, all combinations were found!")
-        logger.debug(
-            "Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
-                (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
-                sol_counter / (time() - start_time)))
+        # logger.debug("Program finished, all combinations were found!")
+        # logger.debug(
+        #     "Time elapsed: %.2f (s) \t Solutions generated: %d \t Rate (last min.): %0.2f sol/s  \t Rate (overall): %0.2f sol/s" % (
+        #         (time() - start_time), sol_counter, (sol_counter - last_counter) / (time() - last_timepoint),
+        #         sol_counter / (time() - start_time)))
 
         return (sol_counter, hammingDistance(master.sequence, solution.sequence), initial_dist)

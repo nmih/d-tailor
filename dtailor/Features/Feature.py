@@ -64,19 +64,19 @@ class Feature(object):
         Function that determines if a target wasn't hit and, if not, updates target instructions 
         '''
         if desiredSolution == None:
-            logger.debug('no desiredSolution')
+            # logger.debug('no desiredSolution')
             return True
         
         #check if there is a target
         if not self.label+self.__class__.__name__+"Level" in desiredSolution:
-            logger.debug(desiredSolution)
-            logger.debug('no target found {}'.format(self.label+self.__class__.__name__+"Level"))
+            # logger.debug(desiredSolution)
+            # logger.debug('no target found {}'.format(self.label+self.__class__.__name__+"Level"))
             return False
         else:
             target_level = desiredSolution[self.label+self.__class__.__name__+"Level"]
             
             if target_level == 0:
-                logger.debug('Target level == 0')
+                # logger.debug('Target level == 0')
                 return False        
                         
             if target_level != self.level:
@@ -100,7 +100,7 @@ class Feature(object):
                     
                 return True
 
-            logger.debug('{}: current level ({}) already equal to target level ({})'.format(self.label, self.level, target_level))
+            # logger.debug('{}: current level ({}) already equal to target level ({})'.format(self.label, self.level, target_level))
             return False
 
         
@@ -148,7 +148,7 @@ class Feature(object):
             else:
                 mutable_region = self.mutable_region
 
-        logger.debug('Mutable region: {}'.format(mutable_region))
+        # logger.debug('Mutable region: {}'.format(mutable_region))
 
         new_seq = Functions.randomMutationOperator(self.solution.sequence, self.solution.keep_aa, mutable_region,
                                                    self.solution.cds_region,

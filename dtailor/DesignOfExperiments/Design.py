@@ -87,4 +87,4 @@ class CustomDesign(Design):
         self.listDesigns = targets
         self.nDesigns = len(targets)
 
-        logger.debug('Designs/targets: {}'.format(self.listDesigns))
+        # logger.debug('Designs/targets: {}'.format(self.listDesigns))

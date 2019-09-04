@@ -115,11 +115,11 @@ class Solution:
             
             rm = choice(mutable)
             tomutatefeatures = [k.label+k.__class__.__name__ for k in mutable]
-            logger.debug('Mutating for goal of meeting levels for: {}'.format(tomutatefeatures))
-            logger.debug('Current scores: {}'.format([self.scores[k] for k in tomutatefeatures]))
-            logger.debug('Current levels: {}'.format([self.levels[k+"Level"] for k in tomutatefeatures]))
-            logger.debug('Desired levels: {}'.format([desiredSolution[k+"Level"] for k in tomutatefeatures]))
-            logger.debug("Mutating... " + rm.label+rm.__class__.__name__)
+            # logger.debug('Mutating for goal of meeting levels for: {}'.format(tomutatefeatures))
+            # logger.debug('Current scores: {}'.format([self.scores[k] for k in tomutatefeatures]))
+            # logger.debug('Current levels: {}'.format([self.levels[k+"Level"] for k in tomutatefeatures]))
+            # logger.debug('Desired levels: {}'.format([desiredSolution[k+"Level"] for k in tomutatefeatures]))
+            # logger.debug("Mutating... " + rm.label+rm.__class__.__name__)
             
             return rm.mutate()
             #return choice(mutable).randomMutation()
@@ -129,7 +129,7 @@ class Solution:
         # n_mut is set to really high numbers so many mutations are made in the "neutral" setting (which is the only
         # time this function is used)
         # TODO: #later: make n_mut alterable from higher-level functions
-        logger.debug('Mutating using Solution.randomMutation')
+        # logger.debug('Mutating using Solution.randomMutation')
         if not n_mut:
             n_mut = (20, 40, 80, 160, 240, 320, 400, 500, 600, 1000, 2000)
         new_seq = randomMutationOperator(self.sequence, self.keep_aa, self.mutable_region, self.cds_region, None, pos, n_mut)
